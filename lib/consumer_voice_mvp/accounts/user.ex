@@ -7,7 +7,9 @@ defmodule ConsumerVoiceMvp.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :role, Ecto.Enum, values: [:admin, :client, :employee]
 
+    belongs_to :company, ConsumerVoiceMvp.Accounts.Company
     timestamps(type: :utc_datetime)
   end
 
@@ -35,10 +37,22 @@ defmodule ConsumerVoiceMvp.Accounts.User do
       Defaults to `true`.
   """
   def registration_changeset(user, attrs, opts \\ []) do
+    attrs =
+      if attrs["role"] != "employee" do
+        Map.put(attrs, "company_id", nil)
+      else
+        attrs
+      end
+
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :role, :company_id])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> validate_inclusion(:role, [:admin, :client, :employee])
+    |> check_constraint(:role,
+      name: :employees_must_have_company,
+      message: "Employee must have a company"
+    )
   end
 
   defp validate_email(changeset, opts) do

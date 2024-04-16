@@ -5,6 +5,15 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
   alias ConsumerVoiceMvp.Accounts.User
 
   def render(assigns) do
+    options = [
+      "admin",
+      "client",
+      "employee"
+    ]
+
+    assigns = assign(assigns, :options, options)
+    IO.inspect(@form[:role])
+
     ~H"""
     <div class="mx-auto max-w-sm">
       <.header class="text-center">
@@ -33,6 +42,16 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
 
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
+        <.input field={@form[:role]} type="select" label="Role" options={@options} />
+
+        <%= if @is_employee do %>
+          <.input
+            field={@form[:company_id]}
+            type="select"
+            label="Company (If Your are Employee)"
+            options={@companies}
+          />
+        <% end %>
 
         <:actions>
           <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
@@ -44,10 +63,16 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
 
   def mount(_params, _session, socket) do
     changeset = Accounts.change_user_registration(%User{})
+    companies = Accounts.list_companies()
 
     socket =
       socket
-      |> assign(trigger_submit: false, check_errors: false)
+      |> assign(
+        trigger_submit: false,
+        check_errors: false,
+        is_employee: false,
+        companies: Enum.map(companies, fn company -> {company.name, company.id} end)
+      )
       |> assign_form(changeset)
 
     {:ok, socket, temporary_assigns: [form: nil]}
@@ -66,13 +91,19 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
         {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        socket = assign_is_employee(socket, user_params["role"])
         {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
     end
   end
 
   def handle_event("validate", %{"user" => user_params}, socket) do
+    socket = assign_is_employee(socket, user_params["role"])
     changeset = Accounts.change_user_registration(%User{}, user_params)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
+  end
+
+  defp assign_is_employee(socket, role) do
+    assign(socket, is_employee: role === "employee")
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do

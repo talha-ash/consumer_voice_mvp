@@ -6,7 +6,7 @@ defmodule ConsumerVoiceMvp.Accounts do
   import Ecto.Query, warn: false
   alias ConsumerVoiceMvp.Repo
 
-  alias ConsumerVoiceMvp.Accounts.{User, UserToken, UserNotifier}
+  alias ConsumerVoiceMvp.Accounts.{User, UserToken, UserNotifier, Company}
 
   ## Database getters
 
@@ -349,5 +349,16 @@ defmodule ConsumerVoiceMvp.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  @doc """
+  List All Companies.
+
+  ## Examples
+
+      iex> list_companies()
+  """
+  def list_companies() do
+    Repo.all(Company)
   end
 end

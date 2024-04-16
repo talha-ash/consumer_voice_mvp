@@ -9,3 +9,41 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias ConsumerVoiceMvp.{Accounts, Repo}
+
+# Create a Companies
+companies = [
+  %{
+    name: "Company 1",
+    inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+    updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+  },
+  %{
+    name: "Company 2",
+    inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+    updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+  },
+  %{
+    name: "Company 3",
+    inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+    updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+  },
+  %{
+    name: "Company 4",
+    inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+    updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+  },
+  %{
+    name: "Company 5",
+    inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+    updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+  }
+]
+
+Repo.delete_all(Accounts.Company)
+
+Repo.insert_all(
+  Accounts.Company,
+  companies
+)
