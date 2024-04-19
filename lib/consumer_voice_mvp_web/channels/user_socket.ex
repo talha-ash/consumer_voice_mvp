@@ -10,7 +10,8 @@ defmodule ConsumerVoiceMvpWeb.UserSocket do
   # Uncomment the following line to define a "room:*" topic
   # pointing to the `ConsumerVoiceMvpWeb.RoomChannel`:
   #
-  channel "user:*", ConsumerVoiceMvpWeb.UserChannel
+  channel "client:*", ConsumerVoiceMvpWeb.ClientChannel
+  channel "employee:*", ConsumerVoiceMvpWeb.EmployeeChannel
   #
   # To create a channel file, use the mix task:
   #

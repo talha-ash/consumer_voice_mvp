@@ -231,7 +231,7 @@ defmodule ConsumerVoiceMvp.Accounts do
   """
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
-    Repo.one(query)
+    Repo.one(query) |> Repo.preload(:company)
   end
 
   @doc """
@@ -361,4 +361,16 @@ defmodule ConsumerVoiceMvp.Accounts do
   def list_companies() do
     Repo.all(Company)
   end
+
+  @doc """
+  Gets a single company.
+
+
+  ## Examples
+
+      iex> get_company!(123)
+      %Company{}
+
+  """
+  def get_company(id), do: Repo.get(Company, id)
 end

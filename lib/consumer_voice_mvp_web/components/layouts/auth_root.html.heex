@@ -8,13 +8,14 @@
       <%= assigns[:page_title] || "ConsumerVoiceMvp" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script>window.userToken = "<%= assigns[:user_token] %>";</script>
+    <script>
+      window.userToken = "<%= assigns[:user_token] %>";
+    </script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
   <body class="bg-white antialiased">
     <%= if @current_user do %>
-      <div id="user" data-user-id={@current_user.id} />
       <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <li class="text-[0.8125rem] leading-6 text-zinc-900">
           <%= @current_user.email %>
@@ -39,8 +40,13 @@
       </ul>
       <div id="root"></div>
       <%= @inner_content %>
-      <script phx-track-static type="text/javascript" src={~p"/assets/app/main.js"}>
-      </script>
+      <%= if @current_user.role == "employee" do %>
+        <script phx-track-static type="text/javascript" src={~p"/assets/app/employee/main.js"}>
+        </script>
+      <% else %>
+        <script phx-track-static type="text/javascript" src={~p"/assets/app/client/main.js"}>
+        </script>
+      <% end %>
     <% end %>
   </body>
 </html>

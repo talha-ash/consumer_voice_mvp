@@ -1,9 +1,10 @@
 import { createRoot } from "react-dom/client";
-import App from "./App";
-import "./user_socket";
+import "../shared/userSocket";
+import ClientApp from "./ClientApp";
+
 const rootElement = document.getElementById("root");
 
 if (rootElement) {
   const root = createRoot(rootElement);
-  root.render(<App />);
+  root.render(<ClientApp />);
 }
