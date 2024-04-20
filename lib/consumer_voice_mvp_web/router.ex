@@ -26,7 +26,7 @@ defmodule ConsumerVoiceMvpWeb.Router do
   # Other scopes may use custom stacks.
   scope "/api", ConsumerVoiceMvpWeb do
     pipe_through :api
-    resources "/todos", TodoController, except: [:new, :edit]
+    # resources "/todos", TodoController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

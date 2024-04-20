@@ -42,14 +42,6 @@ defmodule ConsumerVoiceMvp.MixProject do
       {:phoenix_live_view, "~> 0.20.2"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
-      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
-      {:heroicons,
-       github: "tailwindlabs/heroicons",
-       tag: "v2.1.1",
-       sparse: "optimized",
-       app: false,
-       compile: false,
-       depth: 1},
       {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.0"},
@@ -72,17 +64,16 @@ defmodule ConsumerVoiceMvp.MixProject do
       setup: [
         "deps.get",
         "ecto.setup",
-        "assets.setup",
-        "assets.build",
+        # "assets.setup",
+        # "assets.build",
         "cmd --cd assets npm install"
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing"],
-      "assets.build": ["tailwind consumer_voice_mvp"],
+      # "assets.setup": ["tailwind.install --if-missing"],
+      # "assets.build": ["tailwind consumer_voice_mvp"],
       "assets.deploy": [
-        "tailwind consumer_voice_mvp --minify",
         "cmd --cd assets node build.js --deploy",
         "phx.digest"
       ]

@@ -1,7 +1,7 @@
 import { Channel } from "phoenix";
-import socket from "../shared/userSocket";
-import { onlineStatusType } from "../shared/types";
-import { ONLINE_STATUS_BUSY } from "../shared/constants";
+import socket from "../../shared/userSocket";
+import { onlineStatusType } from "../../shared/types";
+import { ONLINE_STATUS_BUSY } from "../../shared/constants";
 
 interface ChannelActions {
   setUserStatus: (status: onlineStatusType) => void;

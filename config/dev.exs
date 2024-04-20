@@ -26,7 +26,6 @@ config :consumer_voice_mvp, ConsumerVoiceMvpWeb.Endpoint,
   secret_key_base: "Bys0wHj3hTTPfdMMN9+XZ/5DydpmbGLt8pMG/nC+QTcFfgEddgXhOwWOB9zyTBJo",
   watchers: [
     node: ["build.js", "--watch", cd: Path.expand("../assets", __DIR__)],
-    tailwind: {Tailwind, :install_and_run, [:consumer_voice_mvp, ~w(--watch)]}
   ]
 
 # ## SSL Support

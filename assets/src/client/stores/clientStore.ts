@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { ClientChannel } from "./clientChannel";
-import { ROLE_EMPLOYEE } from "../shared/constants";
-import { IUser, onlineStatusType } from "../shared/types";
-import { getUserData } from "../shared/utils";
+import { ClientChannel } from "../channels/clientChannel";
+import { ROLE_EMPLOYEE } from "../../shared/constants";
+import { IUser, onlineStatusType } from "../../shared/types";
+import { getUserData } from "../../shared/utils";
 
 interface IClientStore {
   actions: {

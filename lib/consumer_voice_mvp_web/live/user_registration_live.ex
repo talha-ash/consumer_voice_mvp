@@ -12,7 +12,6 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
     ]
 
     assigns = assign(assigns, :options, options)
-    IO.inspect(@form[:role])
 
     ~H"""
     <div class="mx-auto max-w-sm">

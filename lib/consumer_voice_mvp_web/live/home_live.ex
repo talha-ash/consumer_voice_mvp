@@ -1,5 +1,4 @@
 defmodule ConsumerVoiceMvpWeb.HomeLive do
-  alias ConsumerVoiceMvp.Accounts
   use ConsumerVoiceMvpWeb, :live_view
 
   def render(assigns) do
@@ -8,7 +7,7 @@ defmodule ConsumerVoiceMvpWeb.HomeLive do
     """
   end
 
-  def mount(%{"token" => token}, _session, socket) do
+  def mount(%{"token" => _token}, _session, socket) do
     encoded_current_user = json_encode_user(socket.assigns.current_user)
     socket = assign(socket, :encoded_current_user, encoded_current_user)
 
