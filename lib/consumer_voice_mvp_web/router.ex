@@ -26,7 +26,7 @@ defmodule ConsumerVoiceMvpWeb.Router do
   # Other scopes may use custom stacks.
   scope "/api", ConsumerVoiceMvpWeb do
     pipe_through :api
-    # resources "/todos", TodoController, except: [:new, :edit]
+    resources "/companies", CompanyController, except: [:new, :edit]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
@@ -85,4 +85,15 @@ defmodule ConsumerVoiceMvpWeb.Router do
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
   end
+
+  scope "/", ConsumerVoiceMvpWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :redirect_on_route_not_matched,
+      root_layout: {ConsumerVoiceMvpWeb.Layouts, :auth_root},
+      on_mount: [{ConsumerVoiceMvpWeb.UserAuth, :ensure_authenticated}] do
+      live "/*_", HomeLive, :index
+    end
+  end
+
 end

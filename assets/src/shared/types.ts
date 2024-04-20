@@ -21,6 +21,7 @@ export type IUser = {
 
 export interface ICompany {
   name: string;
+  id: string;
 }
 
 export type roleType =

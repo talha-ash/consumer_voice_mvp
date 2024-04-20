@@ -1,20 +1,13 @@
-// See the Tailwind configuration guide for advanced usage
-// https://tailwindcss.com/docs/configuration
-
-const plugin = require("tailwindcss/plugin");
-const fs = require("fs");
-const path = require("path");
-const { fontFamily } = require("tailwindcss/defaultTheme")
-
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
   content: [
-    "./src/**/*.js",
-    "./src/**/*.tsx",
-    "./src/**/*.ts",
-    "../lib/consumer_voice_mvp_web.ex",
-    "../lib/consumer_voice_mvp_web/**/*.*ex",
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
+  prefix: "",
   theme: {
     container: {
       center: true,
@@ -60,12 +53,9 @@ module.exports = {
         },
       },
       borderRadius: {
-        lg: `var(--radius)`,
-        md: `calc(var(--radius) - 2px)`,
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {
@@ -83,29 +73,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/forms"),
-    plugin(({ addVariant }) =>
-      addVariant("phx-no-feedback", [".phx-no-feedback&", ".phx-no-feedback &"])
-    ),
-    plugin(({ addVariant }) =>
-      addVariant("phx-click-loading", [
-        ".phx-click-loading&",
-        ".phx-click-loading &",
-      ])
-    ),
-    plugin(({ addVariant }) =>
-      addVariant("phx-submit-loading", [
-        ".phx-submit-loading&",
-        ".phx-submit-loading &",
-      ])
-    ),
-    plugin(({ addVariant }) =>
-      addVariant("phx-change-loading", [
-        ".phx-change-loading&",
-        ".phx-change-loading &",
-      ])
-    ),
-    require("tailwindcss-animate"),
-  ],
-};
+  plugins: [require("tailwindcss-animate")],
+}
