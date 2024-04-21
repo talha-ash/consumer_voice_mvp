@@ -1,4 +1,5 @@
 defmodule ConsumerVoiceMvpWeb.UserSocket do
+  alias ConsumerVoiceMvp.Const
   use Phoenix.Socket
 
   # A Socket handler
@@ -10,8 +11,16 @@ defmodule ConsumerVoiceMvpWeb.UserSocket do
   # Uncomment the following line to define a "room:*" topic
   # pointing to the `ConsumerVoiceMvpWeb.RoomChannel`:
   #
+
+  @client_company_topic Const.encode(:client_company_topic)
+  @employee_company_topic Const.encode(:employee_company_topic)
+
+  #Todo remove order matter condition
+  channel "#{@client_company_topic}*", ConsumerVoiceMvpWeb.ClientCompanyChannel
+  channel "#{@employee_company_topic}*", ConsumerVoiceMvpWeb.EmployeeCompanyChannel
   channel "client:*", ConsumerVoiceMvpWeb.ClientChannel
   channel "employee:*", ConsumerVoiceMvpWeb.EmployeeChannel
+
   #
   # To create a channel file, use the mix task:
   #

@@ -2,7 +2,7 @@ import { useClientStore } from "./stores/clientStore";
 import { Link, Route, Switch } from "wouter";
 import { Home, CompanyDetail } from "./screens";
 const ClientApp = () => {
-  const client = useClientStore((state) => state.data.user);
+  const client = useClientStore((state) => state.data.client);
 
   return (
     <div>

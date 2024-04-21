@@ -8,6 +8,7 @@ defmodule ConsumerVoiceMvp.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :role, Ecto.Enum, values: [:admin, :client, :employee]
+    field :status, :string, virtual: true
 
     belongs_to :company, ConsumerVoiceMvp.Accounts.Company
     timestamps(type: :utc_datetime)

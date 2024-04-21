@@ -4,7 +4,6 @@ import styles from "./home.module.css";
 const Home = () => {
   const companiesQuery = useCompaniesQuery();
 
-  console.log(companiesQuery);
   return (
     <div className={styles.homeContainer}>
       <h1 className="text-xl">Companies</h1>

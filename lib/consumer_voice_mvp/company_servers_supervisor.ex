@@ -9,7 +9,7 @@ defmodule ConsumerVoiceMvp.CompanyServersSupervisor do
   end
 
   @impl true
-  def init(args) do
+  def init(_args) do
     DynamicSupervisor.init(strategy: :one_for_one, shutdown: :infinity)
   end
 

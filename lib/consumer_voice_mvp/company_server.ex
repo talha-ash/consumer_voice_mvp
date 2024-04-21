@@ -9,7 +9,6 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def init(company) do
-    IO.inspect(company, label: "company server")
     Process.flag(:trap_exit, true)
     {:ok, %{company: company}}
   end
@@ -21,7 +20,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   end
 
   @impl true
-  def terminate(reason, state) do
+  def terminate(reason, _state) do
     IO.inspect(reason, label: "reason")
     :ok
   end

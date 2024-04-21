@@ -1,10 +1,26 @@
+import { useEffect } from "react";
 import { useCompanyQuery } from "../queryHooks";
+import { useClientStore } from "../stores/clientStore";
 
 interface ICompanyDetailProps {
   id: string;
 }
 const CompanyDetail = ({ id }: ICompanyDetailProps) => {
   const companyQuery = useCompanyQuery(id);
+  const client = useClientStore((state) => state.data.client);
+  const createClientCompanyChannel = useClientStore(
+    (state) => state.actions.createClientCompanyChannel
+  );
+  const removeClientCompanyChannel = useClientStore(
+    (state) => state.actions.removeClientCompanyChannel
+  );
+
+  useEffect(() => {
+    createClientCompanyChannel(id);
+    return () => {
+      removeClientCompanyChannel();
+    };
+  }, []);
 
   return (
     <div className="flex m-5">

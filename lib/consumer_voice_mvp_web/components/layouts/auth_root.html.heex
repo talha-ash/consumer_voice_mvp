@@ -7,12 +7,12 @@
     <.live_title suffix=" · Phoenix Framework">
       <%= assigns[:page_title] || "ConsumerVoiceMvp" %>
     </.live_title>
-     <%= if @current_user.role == "employee" do %>
-        <link phx-track-static rel="stylesheet" href={~p"/assets/src/employee/main.css"} />
-      <% else %>
-        <link phx-track-static rel="stylesheet" href={~p"/assets/src/client/main.css"} />
-      <% end %>
-      <link phx-track-static rel="stylesheet" href={~p"/assets/src/shared/app.css"} />
+    <%= if @current_user.role == "employee" do %>
+      <link phx-track-static rel="stylesheet" href={~p"/assets/src/employee/main.css"} />
+    <% else %>
+      <link phx-track-static rel="stylesheet" href={~p"/assets/src/client/main.css"} />
+    <% end %>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/src/shared/app.css"} />
     <script>
       window.userToken = "<%= assigns[:user_token] %>";
     </script>
@@ -45,7 +45,7 @@
       </ul>
       <div id="root"></div>
       <%= @inner_content %>
-      <%= if @current_user.role == "employee" do %>
+      <%= if @current_user.role == :employee do %>
         <script phx-track-static type="text/javascript" src={~p"/assets/src/employee/main.js"}>
         </script>
       <% else %>

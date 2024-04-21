@@ -4,31 +4,49 @@ import { ClientChannel } from "../channels/clientChannel";
 import { ROLE_EMPLOYEE } from "../../shared/constants";
 import { IUser, onlineStatusType } from "../../shared/types";
 import { getUserData } from "../../shared/utils";
+import { ClientCompanyChannel } from "../channels";
 
 interface IClientStore {
   actions: {
     setStatus: (status: onlineStatusType) => void;
+    createClientCompanyChannel: (companyId: string) => void;
+    removeClientCompanyChannel: () => void;
   };
   data: {
-    user: IUser;
-    channel: ClientChannel;
+    client: IUser;
+    clientChannel: ClientChannel;
+    clientCompanyChannel: ClientCompanyChannel | null;
   };
 }
 const initialUser = getUserData();
-console.log(initialUser);
+
 export const useClientStore = create(
   immer<IClientStore>((set) => ({
     data: {
-      user: {
+      client: {
         ...initialUser,
         isEmployee: initialUser.role === ROLE_EMPLOYEE,
       },
-      channel: {} as ClientChannel,
+      clientChannel: {} as ClientChannel,
+      clientCompanyChannel: null,
     },
     actions: {
       setStatus: (status) =>
         set((state) => {
-          state.data.user.status = status;
+          state.data.client.status = status;
+        }),
+      createClientCompanyChannel: (companyId: string) =>
+        set((state) => {
+          state.data.clientCompanyChannel = new ClientCompanyChannel(
+            state.data.client.id,
+            companyId,
+            {}
+          );
+        }),
+      removeClientCompanyChannel: () =>
+        set((state) => {
+          state.data.clientCompanyChannel?.channel.leave();
+          state.data.clientCompanyChannel = null;
         }),
     },
   }))
@@ -39,7 +57,7 @@ useClientStore.setState((state) => {
     ...state,
     data: {
       ...state.data,
-      channel: new ClientChannel(initialUser.id, {
+      clientChannel: new ClientChannel(initialUser.id, {
         setUserStatus: state.actions.setStatus,
       }),
     },

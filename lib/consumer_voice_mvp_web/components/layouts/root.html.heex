@@ -8,7 +8,7 @@
       <%= assigns[:page_title] || "ConsumerVoiceMvp" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/src/shared/app.css"} />
-    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/src/app.js"}>
     </script>
   </head>
   <body class="bg-white antialiased">
@@ -54,10 +54,5 @@
       <% end %>
     </ul>
     <%= @inner_content %>
-    <%= if @current_user do %>
-      <div id="root"></div>
-      <script phx-track-static type="text/javascript" src={~p"/assets/app/main.js"}>
-      </script>
-    <% end %>
   </body>
 </html>
