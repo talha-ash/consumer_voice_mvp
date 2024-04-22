@@ -2,6 +2,7 @@ defmodule ConsumerVoiceMvp.Accounts.Company do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :name]}
   schema "companies" do
     field :name, :string
 
@@ -11,7 +12,7 @@ defmodule ConsumerVoiceMvp.Accounts.Company do
 
   @field :name
 
-  def changeset(company , attrs) do
+  def changeset(company, attrs) do
     company
     |> cast(attrs, [@field])
     |> validate_required([@field])

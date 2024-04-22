@@ -2,6 +2,8 @@ defmodule ConsumerVoiceMvp.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder,
+           only: [:id, :email, :role, :company_id, :confirmed_at, :status, :company]}
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true

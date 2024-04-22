@@ -4,5 +4,7 @@ export const ROLE_EMPLOYEE = "employee";
 export const ONLINE_STATUS_ON = "on";
 export const ONLINE_STATUS_OFF = "off";
 export const ONLINE_STATUS_BUSY = "busy";
-
+export const COMPANY_STATUS_AVAILABLE = "available";
+export const COMPANY_STATUS_OFFLINE = "offline";
+export const COMPANY_STATUS_BUSY = "busy";
 

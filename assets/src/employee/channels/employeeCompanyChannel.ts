@@ -1,8 +1,11 @@
 import { Channel } from "phoenix";
 import socket from "../../shared/userSocket";
-import { EMPLOYEE_COMPANY_TOPIC } from "../constants";
+import { EMPLOYEE_COMPANY_TOPIC, EN_COMPANY_STATE_UPDATE } from "../constants";
+import { companyStateType } from "../type";
 
-interface ChannelActions {}
+interface ChannelActions {
+  onCompanyStateUpdate: (companyState: companyStateType) => void;
+}
 
 export class EmployeeCompanyChannel {
   channel: Channel;
@@ -11,6 +14,7 @@ export class EmployeeCompanyChannel {
     companyId: string,
     public actions: ChannelActions
   ) {
+    console.log(companyId, "companyId");
     this.channel = socket.channel(`${EMPLOYEE_COMPANY_TOPIC}${companyId}`, {
       employeeId,
     });
@@ -26,8 +30,12 @@ export class EmployeeCompanyChannel {
   }
 
   handleEvents() {
-    this.channel.on("new_message", (message) => {
-      console.log("New message", message);
-    });
+    this.channel.on(
+      EN_COMPANY_STATE_UPDATE,
+      (companyState: companyStateType) => {
+        console.log(EN_COMPANY_STATE_UPDATE, companyState);
+        this.actions.onCompanyStateUpdate(companyState);
+      }
+    );
   }
 }

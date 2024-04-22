@@ -4,7 +4,6 @@ import { EmployeeChannel } from "../channels/employeeChannel";
 import { ROLE_EMPLOYEE } from "../../shared/constants";
 import { IUser, onlineStatusType } from "../../shared/types";
 import { getUserData } from "../../shared/utils";
-import { EmployeeCompanyChannel } from "../channels";
 
 interface IEmployeeStore {
   actions: {
@@ -13,7 +12,6 @@ interface IEmployeeStore {
   data: {
     employee: IUser;
     employeeChannel: EmployeeChannel;
-    employeeCompanyChannel: EmployeeCompanyChannel;
   };
 }
 const initialUser = getUserData();
@@ -23,10 +21,10 @@ export const useEmployeeStore = create(
     data: {
       employee: {
         ...initialUser,
+        companyId: initialUser.company_id,
         isEmployee: initialUser.role === ROLE_EMPLOYEE,
       },
       employeeChannel: {} as EmployeeChannel,
-      employeeCompanyChannel: {} as EmployeeCompanyChannel,
     },
     actions: {
       setStatus: (status) =>
@@ -46,11 +44,6 @@ useEmployeeStore.setState((state) => {
         employeeChannel: new EmployeeChannel(initialUser.id, {
           setUserStatus: state.actions.setStatus,
         }),
-        employeeCompanyChannel: new EmployeeCompanyChannel(
-          initialUser.id,
-          initialUser.company.id,
-          {}
-        ),
       },
     };
   } catch (e) {

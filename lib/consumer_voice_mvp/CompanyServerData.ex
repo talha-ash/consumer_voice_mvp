@@ -1,9 +1,6 @@
 defmodule ConsumerVoiceMvp.CompanyServerData do
   alias ConsumerVoiceMvp.Const
-
-  defmodule CompanyServerState do
-    defstruct status: nil, idle_employees: nil, client_queue: [], online_employees_list: []
-  end
+  alias ConsumerVoiceMvp.Accounts.{Company}
 
   @employee_status_idle Const.encode(:employee_status_idle)
   @employee_status_busy Const.encode(:employee_status_busy)
@@ -13,11 +10,11 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
   @company_status_busy Const.encode(:company_status_busy)
   @company_status_offline Const.encode(:company_status_offline)
 
-  def on_employee_online(companyServerState = %CompanyServerState{}, employee) do
+  def on_employee_online(companyServerState, employee) do
     employee = Map.put(employee, :status, @employee_status_idle)
 
     companyServerState =
-      Map.merge(companyServerState, %CompanyServerState{
+      Map.merge(companyServerState, %{
         status: @company_status_available,
         idle_employees: companyServerState.idle_employees + 1,
         online_employees_list: companyServerState.online_employees_list ++ [employee]
@@ -26,7 +23,7 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
     companyServerState
   end
 
-  def on_employee_offline(companyServerState = %CompanyServerState{}, employee_id) do
+  def on_employee_offline(companyServerState, employee_id) do
     online_employees_list =
       Enum.filter(companyServerState.online_employees_list, fn employee ->
         employee.id != employee_id
@@ -40,7 +37,7 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
     company_status = if is_available, do: @company_status_available, else: @company_status_busy
 
     companyServerState =
-      Map.merge(companyServerState, %CompanyServerState{
+      Map.merge(companyServerState, %{
         status: company_status,
         idle_employees: companyServerState.idle_employees - 1,
         online_employees_list: online_employees_list

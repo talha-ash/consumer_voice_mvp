@@ -1,13 +1,19 @@
+import { Home } from "./screens/Home";
+import { EmployeeCompanyStoreProvider } from "./stores/employeeCompanyStore";
+
 import { useEmployeeStore } from "./stores/employeeStore";
 
 const EmployeeApp = () => {
   const employee = useEmployeeStore((state) => state.data.employee);
 
+  if (!employee.id) {
+    return null;
+  }
   console.log(employee);
   return (
-    <div>
-      <h1>Hello Employee Worldd {employee.role}</h1>
-    </div>
+    <EmployeeCompanyStoreProvider employee={employee}>
+      <Home />
+    </EmployeeCompanyStoreProvider>
   );
 };
 

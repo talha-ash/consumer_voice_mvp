@@ -12,7 +12,7 @@ export type IUser = {
   email: string;
   status: onlineStatusType;
   confirmed_at: string | null;
-  company_id: number | null;
+  companyId: string | null;
   isEmployee: boolean;
   company: ICompany | null;
   inserted_at: string;
@@ -33,3 +33,8 @@ export type onlineStatusType =
   | typeof constants.ONLINE_STATUS_ON
   | typeof constants.ONLINE_STATUS_OFF
   | typeof constants.ONLINE_STATUS_BUSY;
+
+export type companyStatusType =
+  | typeof constants.COMPANY_STATUS_AVAILABLE
+  | typeof constants.COMPANY_STATUS_OFFLINE
+  | typeof constants.COMPANY_STATUS_BUSY;
