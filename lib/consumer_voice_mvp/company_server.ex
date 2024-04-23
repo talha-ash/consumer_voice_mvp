@@ -38,6 +38,15 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   end
 
   @impl true
+  def handle_cast({:on_employee_offline, employee_id}, state) do
+    state = CompanyServerData.on_employee_offline(state, employee_id)
+
+    broadcast_state_update(state)
+
+    {:noreply, state}
+  end
+
+  @impl true
   def terminate(reason, _state) do
     IO.inspect(reason, label: "reason")
     :ok

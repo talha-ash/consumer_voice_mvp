@@ -1,1 +1,1 @@
-export const COMPANY_CLIENT_TOPIC = "company:client";
+export const CLIENT_COMPANY_TOPIC = "client:company:";

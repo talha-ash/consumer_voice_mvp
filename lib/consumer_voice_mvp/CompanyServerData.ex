@@ -13,14 +13,17 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
   def on_employee_online(companyServerState, employee) do
     employee = Map.put(employee, :status, @employee_status_idle)
 
-    companyServerState =
-      Map.merge(companyServerState, %{
-        status: @company_status_available,
-        idle_employees: companyServerState.idle_employees + 1,
-        online_employees_list: companyServerState.online_employees_list ++ [employee]
-      })
+    case employee_already_online?(companyServerState.online_employees_list, employee.id) do
+      true ->
+        companyServerState
 
-    companyServerState
+      false ->
+        Map.merge(companyServerState, %{
+          status: @company_status_available,
+          idle_employees: companyServerState.idle_employees + 1,
+          online_employees_list: companyServerState.online_employees_list ++ [employee]
+        })
+    end
   end
 
   def on_employee_offline(companyServerState, employee_id) do
@@ -44,5 +47,9 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
       })
 
     companyServerState
+  end
+
+  def employee_already_online?(online_list, employee_id) do
+    Enum.any?(online_list, fn employee -> employee.id == employee_id end)
   end
 end

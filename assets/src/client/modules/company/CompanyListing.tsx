@@ -1,14 +1,3 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-
 import { ICompany } from "@/shared/types";
 import { useLocation } from "wouter";
 
@@ -20,28 +9,46 @@ export const CompanyListing = ({ companies }: ICompanyListingProps) => {
   const [_location, setLocation] = useLocation();
 
   return (
-    <Table>
-      <TableCaption>Companies</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[150px]">Name</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {companies.map((company) => {
-          return (
-            <TableRow key={company.id}>
-              <TableCell className="font-medium">{company.name}</TableCell>
-              <TableCell className="flex gap-1 m-2 justify-end">
-                <Button onClick={() => setLocation(`/company/${company.id}`)}>
-                  Visit
-                </Button>
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+    <div className="w-full overflow-x-auto">
+      <table
+        className="w-full text-left rounded w-overflow-x-auto "
+        cellSpacing="0"
+      >
+        <tbody>
+          <tr>
+            <th
+              scope="col"
+              className="h-12 px-6 text-sm font-medium stroke-slate-700 text-slate-700 bg-slate-100"
+            >
+              Name
+            </th>
+            <th
+              scope="col"
+              className="h-12 px-6 text-sm font-medium stroke-slate-700 text-slate-700 bg-slate-100"
+            >
+              Actions
+            </th>
+          </tr>
+          {companies.map((company) => {
+            return (
+              <tr>
+                <td className="h-12 px-6 text-sm transition duration-300 border-slate-200 stroke-slate-500 text-slate-500 ">
+                  {company.name}
+                </td>
+
+                <td className="h-12 px-6 text-sm transition duration-300 border-slate-200 stroke-slate-500 text-slate-500 ">
+                  <button
+                    className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-6 text-sm font-medium tracking-wide text-white shadow-lg shadow-emerald-200 transition duration-300 hover:bg-emerald-600 hover:shadow-md hover:shadow-emerald-200 focus:bg-emerald-700 focus:shadow-md focus:shadow-emerald-200 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
+                    onClick={() => setLocation(`/company/${company.id}`)}
+                  >
+                    <span>Visit</span>
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 };

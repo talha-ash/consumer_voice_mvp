@@ -39,10 +39,14 @@ export const EmployeeCompanyStoreProvider = ({
             employeeCompanyChannel: {} as EmployeeCompanyChannel,
           },
           actions: {
-            onCompanyStateUpdate: (companyState: companyStateType) =>
+            onCompanyStateUpdate: (companyState: any) =>
               set((state) => {
-                console.log(companyState);
-                state.data.companyState = companyState;
+                state.data.companyState = {
+                  status: companyState.status,
+                  onlineEmployeesList: companyState.online_employees_list,
+                  idleEmployees: companyState.idle_employees,
+                  clientQueue: companyState.client_queue,
+                };
               }),
           },
         };

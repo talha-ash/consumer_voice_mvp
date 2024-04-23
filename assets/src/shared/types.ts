@@ -31,6 +31,7 @@ export type roleType =
 
 export type onlineStatusType =
   | typeof constants.ONLINE_STATUS_ON
+  | typeof constants.ONLINE_STATUS_IDLE
   | typeof constants.ONLINE_STATUS_OFF
   | typeof constants.ONLINE_STATUS_BUSY;
 
