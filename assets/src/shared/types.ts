@@ -7,7 +7,7 @@ declare global {
 }
 
 export type IUser = {
-  id: number;
+  id: string;
   role: roleType;
   email: string;
   status: onlineStatusType;

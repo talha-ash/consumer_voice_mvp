@@ -1,4 +1,4 @@
-import { EmployeesList, ClientQueue } from "../components";
+import { EmployeesList, ClientQueue, CallModal } from "../components";
 
 import { useEmployeeCompanyStore } from "../stores/employeeCompanyStore";
 
@@ -13,6 +13,7 @@ const Home = () => {
       <div className="flex flex-row justify-between gap-2">
         <EmployeesList employeesList={onlineEmployeesList} />
         <ClientQueue clientQueue={companyState.clientQueue} />
+        <CallModal />
       </div>
     </div>
   );

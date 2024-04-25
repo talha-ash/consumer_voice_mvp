@@ -1,6 +1,6 @@
 import { useClientStore } from "./stores/clientStore";
 import { Link, Route, Switch } from "wouter";
-import { Home, CompanyDetail } from "./screens";
+import { Home, Company } from "./screens";
 const ClientApp = () => {
   const client = useClientStore((state) => state.data.client);
 
@@ -10,7 +10,7 @@ const ClientApp = () => {
         <Route path="/" component={Home} />
 
         <Route path="/company/:id">
-          {(params) => <CompanyDetail {...params} />}
+          {(params) => <Company {...params} />}
         </Route>
 
         {/* Default route in a switch */}

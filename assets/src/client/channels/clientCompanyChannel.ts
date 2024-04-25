@@ -2,13 +2,16 @@ import { Channel } from "phoenix";
 import socket from "../../shared/userSocket";
 import { CLIENT_COMPANY_TOPIC } from "../constants";
 import { EN_COMPANY_STATE_UPDATE } from "@/employee/constants";
+import { CLIENT_CALL_INITIATE } from "@/shared/constants";
 
-interface ChannelActions {}
+interface ChannelActions {
+  onClientCompanyStateUpdate: (clientCompanyState: any) => void;
+}
 
 export class ClientCompanyChannel {
   channel: Channel;
   constructor(
-    clientId: number,
+    clientId: string,
     companyId: string,
     public actions: ChannelActions
   ) {
@@ -25,10 +28,12 @@ export class ClientCompanyChannel {
         console.log("Unable to join", resp);
       });
   }
-
+  initiateCompanyCall() {
+    this.channel.push(CLIENT_CALL_INITIATE, {});
+  }
   handleEvents() {
     this.channel.on(EN_COMPANY_STATE_UPDATE, (message) => {
-      console.log("New message", message);
+      this.actions.onClientCompanyStateUpdate(message);
     });
   }
 }

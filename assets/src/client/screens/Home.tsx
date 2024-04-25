@@ -1,4 +1,4 @@
-import { CompanyListing } from "../modules/company/CompanyListing";
+import { CompanyListing } from "../modules/company/components/CompanyListing";
 import { useCompaniesQuery } from "../queryHooks";
 import styles from "./home.module.css";
 const Home = () => {

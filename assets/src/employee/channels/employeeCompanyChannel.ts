@@ -10,7 +10,7 @@ interface ChannelActions {
 export class EmployeeCompanyChannel {
   channel: Channel;
   constructor(
-    employeeId: number,
+    employeeId: string,
     companyId: string,
     public actions: ChannelActions
   ) {

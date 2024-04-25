@@ -8,3 +8,5 @@ export const COMPANY_STATUS_AVAILABLE = "available";
 export const COMPANY_STATUS_OFFLINE = "offline";
 export const COMPANY_STATUS_BUSY = "busy";
 export const ONLINE_STATUS_IDLE = "idle";
+export const CLIENT_CALL_INITIATE = "client_call_initiate";
+export const BR_EN_ON_CALL_ACTIVE = "br_en_on_call_active";

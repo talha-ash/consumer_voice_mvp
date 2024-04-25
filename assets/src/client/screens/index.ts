@@ -1,2 +1,2 @@
 export { Home } from "./Home";
-export { CompanyDetail } from "./CompanyDetail";
+export { Company } from "./Company";

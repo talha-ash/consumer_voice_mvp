@@ -5,6 +5,8 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
   use Phoenix.Channel
 
   @employee_company_topic Const.encode(:employee_company_topic)
+
+  @impl true
   def join(@employee_company_topic <> company_id, params, socket) do
     employee_id = params["employeeId"]
     company_id = Helpers.string_to_integer(company_id)
@@ -36,6 +38,6 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
       {:on_employee_offline, employee_id}
     )
 
-    IO.inspect("Employee Goes Offline: #{IO.inspect(reason)}", label: "reason")
+    IO.inspect("Employee Goes Offline", label: "reason")
   end
 end

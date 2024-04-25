@@ -31,7 +31,7 @@ export const CompanyListing = ({ companies }: ICompanyListingProps) => {
           </tr>
           {companies.map((company) => {
             return (
-              <tr>
+              <tr key={company.id}>
                 <td className="h-12 px-6 text-sm transition duration-300 border-slate-200 stroke-slate-500 text-slate-500 ">
                   {company.name}
                 </td>
