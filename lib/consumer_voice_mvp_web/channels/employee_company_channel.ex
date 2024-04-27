@@ -28,7 +28,7 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
   end
 
   @impl true
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     employee_id = socket.assigns.employee_id
     company_id = socket.assigns.company_id
     {:ok, pid} = CompanyRegistry.company_pid_lookup(company_id)

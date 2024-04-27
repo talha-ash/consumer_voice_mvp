@@ -7,6 +7,7 @@ defmodule ConsumerVoiceMvpWeb.ClientChannel do
 
   @impl true
   def join("client:" <> client_id, _params, socket) do
+    client_id = String.to_integer(client_id)
     socket = assign(socket, :client_id, client_id)
     {:ok, socket}
   end

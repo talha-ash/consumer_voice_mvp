@@ -124,9 +124,15 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   end
 
   @impl true
-  def handle_cast({@client_drop_call_decoded, params}, state) do
-    {employee_id, client_id} = params
+  def handle_cast({@client_drop_call_decoded, {nil, client_id}}, state) do
+    {state, employee_id} = CompanyServerData.on_drop_call(state, client_id, nil)
 
+    broadcast_client_call_drop(employee_id)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({@client_drop_call_decoded, {employee_id, client_id}}, state) do
     state = CompanyServerData.on_drop_call(state, client_id, employee_id)
 
     broadcast_client_call_drop(employee_id)

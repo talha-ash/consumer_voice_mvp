@@ -28,9 +28,9 @@ export class ClientChannel {
       });
   }
 
-  dropCall(companyId: string, employeeId: string) {    
+  dropCall(companyId: string, employeeId: string) {
     this.channel.push(CLIENT_DROP_CALL, {
-      employee_id: employeeId,
+      employee_id: employeeId || null,
       company_id: companyId,
     });
   }

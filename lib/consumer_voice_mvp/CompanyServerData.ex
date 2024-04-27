@@ -84,10 +84,18 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
         {:call_unfound, companyServerState}
 
       {:ok, active_calls, call} ->
+        online_employees_list =
+          set_employee_status(
+            companyServerState.online_employees_list,
+            call.employee_id,
+            @employee_status_idle
+          )
+
         companyServerState =
           Map.merge(companyServerState, %{
             client_queue: client_queue,
-            active_calls: active_calls
+            active_calls: active_calls,
+            online_employees_list: online_employees_list
           })
 
         {:call_found, companyServerState, call}
@@ -133,6 +141,34 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
       })
 
     companyServerState
+  end
+
+  def on_drop_call(companyServerState, client_id, nil) do
+    key = get_active_call_key({:client, client_id}, companyServerState.active_calls)
+
+    call = Map.get(companyServerState.active_calls, key)
+    employee_id = call.employee_id
+
+    online_employees_list =
+      set_employee_status(
+        companyServerState.online_employees_list,
+        employee_id,
+        @employee_status_idle
+      )
+
+    companyServerState =
+      Map.merge(companyServerState, %{
+        status: company_status(online_employees_list),
+        idle_employees: companyServerState.idle_employees + 1,
+        active_calls:
+          Map.delete(
+            companyServerState.active_calls,
+            make_active_calls_key(employee_id, client_id)
+          ),
+        online_employees_list: online_employees_list
+      })
+
+    {companyServerState, employee_id}
   end
 
   def on_drop_call(companyServerState, client_id, employee_id) do
