@@ -14,7 +14,6 @@ export class EmployeeCompanyChannel {
     companyId: string,
     public actions: ChannelActions
   ) {
-    console.log(companyId, "companyId");
     this.channel = socket.channel(`${EMPLOYEE_COMPANY_TOPIC}${companyId}`, {
       employeeId,
     });
@@ -33,7 +32,6 @@ export class EmployeeCompanyChannel {
     this.channel.on(
       EN_COMPANY_STATE_UPDATE,
       (companyState: companyStateType) => {
-        console.log(EN_COMPANY_STATE_UPDATE, companyState);
         this.actions.onCompanyStateUpdate(companyState);
       }
     );

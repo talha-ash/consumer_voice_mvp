@@ -9,9 +9,11 @@ import { getUserData } from "../../shared/utils";
 interface IClientStore {
   actions: {
     setStatus: (status: onlineStatusType) => void;
-    onCallActive: () => void;
+    onCallActive: (employeeId: string) => void;
     toggleCallModal: (loading?: boolean) => void;
-    onInitiateCall: () => void;
+    onInitiateCall: (companyId: string) => void;
+    dropCall: () => void;
+    onEmployeeDropCall: () => void;
     // createClientCompanyChannel: (companyId: string) => void;
     // removeClientCompanyChannel: () => void;
   };
@@ -22,6 +24,8 @@ interface IClientStore {
       callModal: boolean;
       callInitiateLoading: boolean;
       callActive: boolean;
+      employeeId: string;
+      companyId: string;
       // callClient: null,
     };
     // clientCompanyChannel: ClientCompanyChannel | null;
@@ -40,6 +44,8 @@ export const useClientStore = create(
         callModal: false,
         callInitiateLoading: false,
         callActive: false,
+        employeeId: "",
+        companyId: "",
         // callClient: null,
       },
       clientChannel: {} as ClientChannel,
@@ -50,20 +56,41 @@ export const useClientStore = create(
         set((state) => {
           state.data.client.status = status;
         }),
-      onCallActive: () =>
+      onCallActive: (employeeId: string) =>
         set((state) => {
           state.data.callState.callActive = true;
           state.data.callState.callInitiateLoading = false;
+          state.data.callState.employeeId = employeeId;
         }),
-      onInitiateCall: () =>
+      onInitiateCall: (companyId) =>
         set((state) => {
           state.data.callState.callInitiateLoading = true;
           state.data.callState.callModal = true;
+          state.data.callState.companyId = companyId;
         }),
       toggleCallModal: (loading?: boolean) =>
         set((state) => {
           state.data.callState.callModal =
             loading ?? !state.data.callState.callModal;
+        }),
+      dropCall: () =>
+        set((state) => {
+          state.data.clientChannel.dropCall(
+            state.data.callState.companyId,
+            state.data.callState.employeeId
+          );
+          state.data.callState.callActive = false;
+          state.data.callState.callInitiateLoading = false;
+          state.data.callState.callModal = false;
+          state.data.callState.companyId = "";
+        }),
+      onEmployeeDropCall: () =>
+        set((state) => {
+          state.data.callState.callActive = false;
+          state.data.callState.callInitiateLoading = false;
+          state.data.callState.callModal = false;
+          state.data.callState.employeeId = "";
+          state.data.callState.companyId = "";
         }),
       // createClientCompanyChannel: (companyId: string) =>
       //   set((state) => {
@@ -90,6 +117,7 @@ useClientStore.setState((state) => {
       clientChannel: new ClientChannel(initialUser.id, {
         setUserStatus: state.actions.setStatus,
         onCallActive: state.actions.onCallActive,
+        onEmployeeDropCall: state.actions.onEmployeeDropCall,
       }),
     },
   };

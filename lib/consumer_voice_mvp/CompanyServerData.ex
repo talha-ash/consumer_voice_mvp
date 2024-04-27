@@ -32,14 +32,28 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
         employee.id != employee_id
       end)
 
-    companyServerState =
-      Map.merge(companyServerState, %{
-        status: company_status(online_employees_list),
-        idle_employees: companyServerState.idle_employees - 1,
-        online_employees_list: online_employees_list
-      })
+    case update_active_calls_on_offline({:employee, employee_id}, companyServerState.active_calls) do
+      {:not_found, _active_calls} ->
+        companyServerState =
+          Map.merge(companyServerState, %{
+            status: company_status(online_employees_list),
+            idle_employees: companyServerState.idle_employees - 1,
+            online_employees_list: online_employees_list
+          })
 
-    companyServerState
+        {:call_unfound, companyServerState}
+
+      {:ok, active_calls, call} ->
+        companyServerState =
+          Map.merge(companyServerState, %{
+            status: company_status(online_employees_list),
+            idle_employees: companyServerState.idle_employees - 1,
+            online_employees_list: online_employees_list,
+            active_calls: active_calls
+          })
+
+        {:call_found, companyServerState, call}
+    end
   end
 
   def on_client_online(companyServerState, client) do
@@ -60,12 +74,24 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
         client.id != client_id
       end)
 
-    companyServerState =
-      Map.merge(companyServerState, %{
-        client_queue: client_queue
-      })
+    case update_active_calls_on_offline({:client, client_id}, companyServerState.active_calls) do
+      {:not_found, _active_calls} ->
+        companyServerState =
+          Map.merge(companyServerState, %{
+            client_queue: client_queue
+          })
 
-    companyServerState
+        {:call_unfound, companyServerState}
+
+      {:ok, active_calls, call} ->
+        companyServerState =
+          Map.merge(companyServerState, %{
+            client_queue: client_queue,
+            active_calls: active_calls
+          })
+
+        {:call_found, companyServerState, call}
+    end
   end
 
   def on_client_call_initiate(%{idle_employees: 0}, _client_id) do
@@ -110,10 +136,30 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
   end
 
   def on_drop_call(companyServerState, client_id, employee_id) do
+    online_employees_list =
+      set_employee_status(
+        companyServerState.online_employees_list,
+        employee_id,
+        @employee_status_idle
+      )
+
     Map.merge(companyServerState, %{
+      status: company_status(online_employees_list),
+      idle_employees: companyServerState.idle_employees + 1,
       active_calls:
-        Map.delete(companyServerState.active_calls, make_active_calls_key(employee_id, client_id))
+        Map.delete(companyServerState.active_calls, make_active_calls_key(employee_id, client_id)),
+      online_employees_list: online_employees_list
     })
+  end
+
+  defp set_employee_status(online_employees_list, employee_id, status) do
+    Enum.map(online_employees_list, fn employee ->
+      if employee.id == employee_id do
+        Map.put(employee, :status, status)
+      else
+        employee
+      end
+    end)
   end
 
   defp employee_already_online?(online_list, employee_id) do
@@ -167,5 +213,49 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
 
   defp make_active_calls_key(employee_id, client_id) do
     "#{employee_id}_#{client_id}"
+  end
+
+  defp update_active_calls_on_offline({:employee, employee_id}, active_calls) do
+    case key = get_active_call_key({:employee, employee_id}, active_calls) do
+      nil ->
+        {:not_found, active_calls}
+
+      _ ->
+        call = Map.get(active_calls, key)
+        active_calls = Map.delete(active_calls, key)
+        {:ok, active_calls, call}
+    end
+  end
+
+  defp update_active_calls_on_offline({:client, client_id}, active_calls) do
+    case key = get_active_call_key({:client, client_id}, active_calls) do
+      nil ->
+        {:not_found, active_calls}
+
+      _ ->
+        call = Map.get(active_calls, key)
+        active_calls = Map.delete(active_calls, key)
+        {:ok, active_calls, call}
+    end
+  end
+
+  defp get_active_call_key({:employee, employee_id}, active_calls) do
+    Enum.reduce(active_calls, nil, fn {key, call}, acc ->
+      if call.employee_id == employee_id do
+        key
+      else
+        acc
+      end
+    end)
+  end
+
+  defp get_active_call_key({:client, client_id}, active_calls) do
+    Enum.reduce(active_calls, nil, fn {key, call}, acc ->
+      if call.client_id == client_id do
+        key
+      else
+        acc
+      end
+    end)
   end
 end

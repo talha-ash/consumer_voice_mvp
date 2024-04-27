@@ -11,10 +11,17 @@ export const CallModal = ({}: ICallModal) => {
   const onAcceptCall = useEmployeeStore((state) => state.actions.onAcceptCall);
   const dropCall = useEmployeeStore((state) => state.actions.dropCall);
 
+  const setVisible = (visible: boolean) => {
+    toggleCallModal(visible);
+    if (!visible) {
+      dropCall();
+    }
+  };
+
   return (
     <Modal
       visible={callState.callModal}
-      setVisible={toggleCallModal}
+      setVisible={setVisible}
       title="Initiating Call"
     >
       {callState.callInitiateLoading ? (

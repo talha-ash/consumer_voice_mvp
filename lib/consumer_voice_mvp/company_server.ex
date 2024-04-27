@@ -54,11 +54,16 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({:on_employee_offline, employee_id}, state) do
-    state = CompanyServerData.on_employee_offline(state, employee_id)
+    case CompanyServerData.on_employee_offline(state, employee_id) do
+      {:call_unfound, state} ->
+        broadcast_state_update(state)
+        {:noreply, state}
 
-    broadcast_state_update(state)
-
-    {:noreply, state}
+      {:call_found, state, call} ->
+        broadcast_employee_call_drop(call.client_id)
+        broadcast_state_update(state)
+        {:noreply, state}
+    end
   end
 
   @impl true
@@ -72,11 +77,16 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({:on_client_offline, client_id}, state) do
-    state = CompanyServerData.on_client_offline(state, client_id)
+    case CompanyServerData.on_client_offline(state, client_id) do
+      {:call_unfound, state} ->
+        broadcast_state_update(state)
+        {:noreply, state}
 
-    broadcast_state_update(state)
-
-    {:noreply, state}
+      {:call_found, state, call} ->
+        broadcast_client_call_drop(call.employee_id)
+        broadcast_state_update(state)
+        {:noreply, state}
+    end
   end
 
   @impl true
@@ -104,6 +114,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({@employee_drop_call_decoded, params}, state) do
+    IO.inspect("handle_cast employee_drop_call_decoded")
     {employee_id, client_id} = params
 
     state = CompanyServerData.on_drop_call(state, client_id, employee_id)
@@ -153,6 +164,8 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   end
 
   defp broadcast_employee_call_drop(client_id) do
+    IO.inspect("broadcast_employee_call_drop")
+
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(
       "#{@client_topic}#{client_id}",
       @br_en_call_drop,
@@ -172,13 +185,13 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(
       "#{@employee_topic}#{employee_id}",
       @br_en_on_call_active,
-      %{}
+      %{client_id: client_id}
     )
 
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(
       "#{@client_topic}#{client_id}",
       @br_en_on_call_active,
-      %{}
+      %{employee_id: employee_id}
     )
   end
 end

@@ -21,7 +21,7 @@ export const CompanyDetail = () => {
 
   const handleinitiateCall = () => {
     initiateCompanyCall();
-    onInitiateCall();
+    onInitiateCall(clientCompanyState.company.id);
   };
 
   return (
