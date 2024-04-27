@@ -17,13 +17,11 @@ export const CallModal = ({}: ICallModal) => {
 
   const setVisible = (visible: boolean) => {
     if (!visible) {
-      console.log(companyId, "aaaaaa");
-      dropCall(companyId);
+      dropCall();
     }
     toggleCallModal(visible);
   };
 
-  console.log(companyId, "bbbb");
   return (
     <Modal
       visible={callState.callModal}
@@ -32,7 +30,7 @@ export const CallModal = ({}: ICallModal) => {
     >
       {callState.callInitiateLoading ? <Spinner /> : null}
       {callState.callActive ? (
-        <Button text={"Drop Call"} onClick={() => dropCall(companyId)} />
+        <Button text={"Drop Call"} onClick={dropCall} />
       ) : null}
     </Modal>
   );
