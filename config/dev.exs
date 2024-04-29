@@ -19,13 +19,13 @@ config :consumer_voice_mvp, ConsumerVoiceMvp.Repo,
 config :consumer_voice_mvp, ConsumerVoiceMvpWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {0, 0, 0, 0}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "Bys0wHj3hTTPfdMMN9+XZ/5DydpmbGLt8pMG/nC+QTcFfgEddgXhOwWOB9zyTBJo",
   watchers: [
-    node: ["build.js", "--watch", cd: Path.expand("../assets", __DIR__)],
+    node: ["build.js", "--watch", cd: Path.expand("../assets", __DIR__)]
   ]
 
 # ## SSL Support

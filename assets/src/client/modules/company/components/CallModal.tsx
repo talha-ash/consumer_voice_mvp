@@ -9,12 +9,17 @@ export const CallModal = ({}: ICallModal) => {
   const toggleCallModal = useClientStore(
     (state) => state.actions.toggleCallModal
   );
-
   const dropCall = useClientStore((state) => state.actions.dropCall);
-  useCallActive(callState);
+  const { dismissAll } = useCallActive(callState);
+
+  const handleDropCall = () => {
+    dropCall();
+    dismissAll();
+  };
+
   const setVisible = (visible: boolean) => {
     if (!visible) {
-      dropCall();
+      handleDropCall();
     }
     toggleCallModal(visible);
   };
@@ -28,7 +33,7 @@ export const CallModal = ({}: ICallModal) => {
       {callState.callInitiateLoading ? <Spinner /> : null}
       {callState.callActive ? (
         <div>
-          <Button text={"Drop Call"} onClick={dropCall} />
+          <Button text={"Drop Call"} onClick={handleDropCall} />
         </div>
       ) : null}
     </Modal>
