@@ -14,6 +14,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   @client_call_initiate_decoded Const.decode("client_call_initiate")
   @client_call_initiate Const.encode(:client_call_initiate)
   @client_topic Const.encode(:client_topic)
+  @client_connection_data_decoded Const.decode("client_connection_data")
 
   @employee_topic Const.encode(:employee_topic)
   @employee_accept_call_decoded Const.decode("employee_accept_call")
@@ -22,6 +23,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   @client_drop_call_decoded Const.decode("client_drop_call")
 
   @br_en_call_drop Const.encode(:br_en_call_drop)
+  @br_client_connection_data Const.encode(:br_client_connection_data)
 
   def start_link(init_arg) do
     GenServer.start_link(__MODULE__, init_arg, name: CompanyRegistry.add_company_pid(init_arg.id))
@@ -104,7 +106,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({@employee_accept_call_decoded, params}, state) do
-    {employee_id, client_id} = params
+    {employee_id, client_id, employee_connection_data} = params
 
     state = CompanyServerData.employee_accept_call(state, client_id, employee_id)
 
@@ -136,6 +138,15 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     state = CompanyServerData.on_drop_call(state, client_id, employee_id)
 
     broadcast_client_call_drop(employee_id)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({@client_connection_data_decoded, params}, state) do
+    {connection_data, client_id, employee_id} = params
+    # {state, employee_id} = CompanyServerData.on_drop_call(state, client_id, nil)
+
+    broadcast_client_connection_data({connection_data, employee_id})
     {:noreply, state}
   end
 
@@ -187,7 +198,15 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     )
   end
 
-  defp broadcast_on_call_active({employee_id, client_id}) do
+  defp broadcast_client_connection_data({connection_data, employee_id}) do
+    ConsumerVoiceMvpWeb.Endpoint.broadcast!(
+      "#{@employee_topic}#{employee_id}",
+      @br_client_connection_data,
+      %{connection_data: connection_data}
+    )
+  end
+
+  defp broadcast_on_call_active({employee_id, client_id, employee_connection_data}) do
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(
       "#{@employee_topic}#{employee_id}",
       @br_en_on_call_active,
@@ -197,7 +216,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(
       "#{@client_topic}#{client_id}",
       @br_en_on_call_active,
-      %{employee_id: employee_id}
+      %{employee_id: employee_id, employee_connection_data: employee_connection_data}
     )
   end
 end

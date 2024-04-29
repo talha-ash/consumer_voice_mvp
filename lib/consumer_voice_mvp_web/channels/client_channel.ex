@@ -4,6 +4,8 @@ defmodule ConsumerVoiceMvpWeb.ClientChannel do
 
   @client_drop_call Const.encode(:client_drop_call)
   @client_drop_call_decoded Const.decode("client_drop_call")
+  @client_connection_data Const.encode(:client_connection_data)
+  @client_connection_data_decoded Const.decode("client_connection_data")
 
   @impl true
   def join("client:" <> client_id, _params, socket) do
@@ -21,6 +23,25 @@ defmodule ConsumerVoiceMvpWeb.ClientChannel do
     GenServer.cast(
       server_pid,
       {@client_drop_call_decoded, {employee_id, client_id}}
+    )
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_in(@client_connection_data, payload, socket) do
+    %{
+      "connection_data" => connection_data,
+      "employee_id" => employee_id,
+      "company_id" => company_id
+    } = payload
+
+    client_id = socket.assigns.client_id
+    {:ok, server_pid} = CompanyRegistry.company_pid_lookup(company_id)
+
+    GenServer.cast(
+      server_pid,
+      {@client_connection_data_decoded, {connection_data, client_id, employee_id}}
     )
 
     {:noreply, socket}

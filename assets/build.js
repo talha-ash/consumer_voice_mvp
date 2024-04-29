@@ -43,6 +43,9 @@ let opts = {
   nodePaths: ["../deps"],
   loader: loader,
   plugins: plugins,
+  define: {
+    "global": 'window',
+  }
 };
 
 if (deploy) {

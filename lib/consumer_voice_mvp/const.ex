@@ -23,14 +23,16 @@ defmodule ConsumerVoiceMvp.Const do
     br_ev_company_state_update: "br_ev_company_state_update",
     br_en_on_call_active: "br_en_on_call_active",
     br_en_call_drop: "br_en_call_drop",
+    br_client_connection_data: "br_client_connection_data",
 
     # Client Hanle In events name
     client_call_initiate: "client_call_initiate",
+    client_drop_call: "client_drop_call",
+    client_connection_data: "client_connection_data",
 
     # Employee Hanle In events name
     employee_accept_call: "employee_accept_call",
-    employee_drop_call: "employee_drop_call",
-    client_drop_call: "client_drop_call"
+    employee_drop_call: "employee_drop_call"
   ]
 
   for {key, value} <- values do

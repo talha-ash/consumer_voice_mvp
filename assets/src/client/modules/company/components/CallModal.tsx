@@ -1,20 +1,17 @@
-import { useClientCompanyStore } from "@/client/stores/clientCompanyStore";
 import { useClientStore } from "@/client/stores/clientStore";
 import { Button, Modal, Spinner } from "@/shared/components";
+import { useCallActive } from "../hooks";
 
 interface ICallModal {}
 
 export const CallModal = ({}: ICallModal) => {
   const callState = useClientStore((state) => state.data.callState);
-  const companyId = useClientCompanyStore(
-    (state) => state.data.clientCompanyState.company.id
-  );
   const toggleCallModal = useClientStore(
     (state) => state.actions.toggleCallModal
   );
 
   const dropCall = useClientStore((state) => state.actions.dropCall);
-
+  useCallActive(callState);
   const setVisible = (visible: boolean) => {
     if (!visible) {
       dropCall();
@@ -30,7 +27,9 @@ export const CallModal = ({}: ICallModal) => {
     >
       {callState.callInitiateLoading ? <Spinner /> : null}
       {callState.callActive ? (
-        <Button text={"Drop Call"} onClick={dropCall} />
+        <div>
+          <Button text={"Drop Call"} onClick={dropCall} />
+        </div>
       ) : null}
     </Modal>
   );

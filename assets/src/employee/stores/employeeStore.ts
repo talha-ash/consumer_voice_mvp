@@ -4,16 +4,18 @@ import { EmployeeChannel } from "../channels/employeeChannel";
 import { ROLE_EMPLOYEE } from "../../shared/constants";
 import { IUser, onlineStatusType } from "../../shared/types";
 import { getUserData } from "../../shared/utils";
+import Peer from "simple-peer";
 
 interface IEmployeeStore {
   actions: {
     setStatus: (status: onlineStatusType) => void;
     onClientCall: (client: IUser) => void;
     toggleCallModal: (loading?: boolean) => void;
-    onAcceptCall: () => void;
+    onAcceptCall: (employeeConnectionData: Peer.SignalData) => void;
     onCallActive: () => void;
     dropCall: () => void;
     onEmployeeDropCall: () => void;
+    onClientConnectionData: (clientConnectionData: Peer.SignalData) => void;
   };
   data: {
     employee: IUser;
@@ -23,6 +25,8 @@ interface IEmployeeStore {
       callActive: boolean;
       callClient: IUser | null;
       callModal: boolean;
+      clientConnectionData: Peer.SignalData | null;
+      employeeConnectionData: Peer.SignalData | null;
     };
   };
 }
@@ -42,6 +46,8 @@ export const useEmployeeStore = create(
         callInitiateLoading: false,
         callActive: false,
         callClient: null,
+        clientConnectionData: null,
+        employeeConnectionData: null,
       },
     },
     actions: {
@@ -60,11 +66,13 @@ export const useEmployeeStore = create(
           state.data.callState.callModal =
             loading ?? !state.data.callState.callModal;
         }),
-      onAcceptCall: () =>
+      onAcceptCall: (employeeConnectionData: Peer.SignalData) =>
         set((state) => {
           if (state.data.callState.callClient) {
+            state.data.callState.employeeConnectionData = employeeConnectionData;
             state.data.employeeChannel.onAcceptCall(
-              state.data.callState.callClient.id
+              state.data.callState.callClient.id,
+              state.data.callState.employeeConnectionData
             );
           }
         }),
@@ -90,6 +98,11 @@ export const useEmployeeStore = create(
           state.data.callState.callClient = null;
           state.data.callState.callModal = false;
         }),
+
+      onClientConnectionData: (connectionData: Peer.SignalData) =>
+        set((state) => {
+          state.data.callState.clientConnectionData = connectionData;
+        }),
     },
   }))
 );
@@ -104,6 +117,7 @@ useEmployeeStore.setState((state) => {
         onClientCall: state.actions.onClientCall,
         onCallActive: state.actions.onCallActive,
         onEmployeeDropCall: state.actions.onEmployeeDropCall,
+        onClientConnectionData: state.actions.onClientConnectionData,
       }),
     },
   };

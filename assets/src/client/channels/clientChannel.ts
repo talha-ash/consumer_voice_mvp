@@ -4,12 +4,16 @@ import { onlineStatusType } from "../../shared/types";
 import {
   BR_EN_CALL_DROP,
   BR_EN_ON_CALL_ACTIVE,
+  CLIENT_CONNECTION_DATA,
   CLIENT_DROP_CALL,
 } from "../../shared/constants";
-
+import Peer from "simple-peer";
 interface ChannelActions {
   setUserStatus: (status: onlineStatusType) => void;
-  onCallActive: (employeeId: string) => void;
+  onCallActive: (
+    employeeId: string,
+    employeeConnectionData: Peer.SignalData
+  ) => void;
   onEmployeeDropCall: () => void;
 }
 
@@ -35,13 +39,20 @@ export class ClientChannel {
     });
   }
 
+  sendClientConnectionData(payload: {
+    connection_data: Peer.SignalData;
+    employee_id: string;
+    company_id: string;
+  }) {
+    this.channel.push(CLIENT_CONNECTION_DATA, payload);
+  }
   handleEvents() {
     this.channel.on(BR_EN_ON_CALL_ACTIVE, (message) => {
-      const { employee_id } = message;
-      this.actions.onCallActive(employee_id);
+      const { employee_id, employee_connection_data } = message;
+      this.actions.onCallActive(employee_id, employee_connection_data);
     });
 
-    this.channel.on(BR_EN_CALL_DROP, (message) => {
+    this.channel.on(BR_EN_CALL_DROP, () => {
       this.actions.onEmployeeDropCall();
     });
   }

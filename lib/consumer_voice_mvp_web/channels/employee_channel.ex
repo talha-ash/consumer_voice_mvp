@@ -27,12 +27,14 @@ defmodule ConsumerVoiceMvpWeb.EmployeeChannel do
   end
 
   @impl true
-  def handle_in(@employee_accept_call, %{"client_id" => client_id}, socket) do
+  def handle_in(@employee_accept_call, payload, socket) do
+    %{"client_id" => client_id, "employee_connection_data" => employee_connection_data} = payload
     server_pid = socket.assigns.server_pid
 
     GenServer.cast(
       server_pid,
-      {@employee_accept_call_decoded, {socket.assigns.employee.id, client_id}}
+      {@employee_accept_call_decoded,
+       {socket.assigns.employee.id, client_id, employee_connection_data}}
     )
 
     {:noreply, socket}
@@ -49,7 +51,4 @@ defmodule ConsumerVoiceMvpWeb.EmployeeChannel do
 
     {:noreply, socket}
   end
-
-
-
 end

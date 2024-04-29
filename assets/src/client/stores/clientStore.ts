@@ -5,15 +5,19 @@ import { ROLE_EMPLOYEE } from "../../shared/constants";
 import { IUser, onlineStatusType } from "../../shared/types";
 import { getUserData } from "../../shared/utils";
 // import { ClientCompanyChannel } from "../channels";
-
+import Peer from "simple-peer";
 interface IClientStore {
   actions: {
     setStatus: (status: onlineStatusType) => void;
-    onCallActive: (employeeId: string) => void;
+    onCallActive: (
+      employeeId: string,
+      employeeConnectionData: Peer.SignalData
+    ) => void;
     toggleCallModal: (loading?: boolean) => void;
     onInitiateCall: (companyId: string) => void;
     dropCall: () => void;
     onEmployeeDropCall: () => void;
+    onClientConnectionData: (connectionData: Peer.SignalData) => void;
     // createClientCompanyChannel: (companyId: string) => void;
     // removeClientCompanyChannel: () => void;
   };
@@ -26,6 +30,7 @@ interface IClientStore {
       callActive: boolean;
       employeeId: string;
       companyId: string;
+      employeeConnectionData: Peer.SignalData | null;
       // callClient: null,
     };
     // clientCompanyChannel: ClientCompanyChannel | null;
@@ -46,6 +51,7 @@ export const useClientStore = create(
         callActive: false,
         employeeId: "",
         companyId: "",
+        employeeConnectionData: null,
         // callClient: null,
       },
       clientChannel: {} as ClientChannel,
@@ -56,11 +62,15 @@ export const useClientStore = create(
         set((state) => {
           state.data.client.status = status;
         }),
-      onCallActive: (employeeId: string) =>
+      onCallActive: (
+        employeeId: string,
+        employeeConnectionData: Peer.SignalData
+      ) =>
         set((state) => {
           state.data.callState.callActive = true;
           state.data.callState.callInitiateLoading = false;
           state.data.callState.employeeId = employeeId;
+          state.data.callState.employeeConnectionData = employeeConnectionData;
         }),
       onInitiateCall: (companyId) =>
         set((state) => {
@@ -91,6 +101,15 @@ export const useClientStore = create(
           state.data.callState.callModal = false;
           state.data.callState.employeeId = "";
           state.data.callState.companyId = "";
+        }),
+      onClientConnectionData: (connectionData: Peer.SignalData) =>
+        set((state) => {
+          console.log("state.data.callState", state.data.callState);
+          state.data.clientChannel.sendClientConnectionData({
+            connection_data: connectionData,
+            employee_id: state.data.callState.employeeId,
+            company_id: state.data.callState.companyId,
+          });
         }),
       // createClientCompanyChannel: (companyId: string) =>
       //   set((state) => {

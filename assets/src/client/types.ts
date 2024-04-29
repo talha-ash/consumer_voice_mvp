@@ -5,3 +5,12 @@ export type clientCompanyState = {
   clientQueue: IUser[];
   company: ICompany;
 };
+
+export type callStateType = {
+  callModal: boolean;
+  callInitiateLoading: boolean;
+  callActive: boolean;
+  employeeId: string;
+  companyId: string;
+  employeeConnectionData: any;
+};

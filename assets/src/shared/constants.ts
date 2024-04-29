@@ -12,3 +12,5 @@ export const CLIENT_CALL_INITIATE = "client_call_initiate";
 export const CLIENT_DROP_CALL = "client_drop_call";
 export const BR_EN_ON_CALL_ACTIVE = "br_en_on_call_active";
 export const BR_EN_CALL_DROP = "br_en_call_drop";
+export const BR_CLIENT_CONNECTION_DATA = "br_client_connection_data";
+export const CLIENT_CONNECTION_DATA = "client_connection_data";
