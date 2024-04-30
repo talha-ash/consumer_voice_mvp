@@ -5,9 +5,16 @@ interface IModal {
   visible: boolean;
   children: React.ReactNode;
   title: string;
+  disableOutsideClick?: boolean;
   setVisible: (visible: boolean) => void;
 }
-export function Modal({ visible, children, title, setVisible }: IModal) {
+export function Modal({
+  visible,
+  children,
+  title,
+  disableOutsideClick = false,
+  setVisible,
+}: IModal) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -16,23 +23,27 @@ export function Modal({ visible, children, title, setVisible }: IModal) {
         setVisible(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
+    if (!disableOutsideClick) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      if (!disableOutsideClick) {
+        document.removeEventListener("mousedown", handleClickOutside);
+      }
     };
   }, [wrapperRef]);
 
-  useEffect(() => {
-    function handleClickOutside(event: any) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setVisible(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [wrapperRef]);
+  // useEffect(() => {
+  //   function handleClickOutside(event: any) {
+  //     if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+  //       setVisible(false);
+  //     }
+  //   }
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [wrapperRef]);
 
   useEffect(() => {
     let html = document.querySelector("html");

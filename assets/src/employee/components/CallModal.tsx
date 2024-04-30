@@ -21,15 +21,18 @@ export const CallModal = ({}: ICallModal) => {
     if (callState.callActive) {
       toggleCallModal(true);
     }
+    return () => {
+      if (callState.callActive) {
+        dismissAll();
+      }
+    };
   }, [callState.callActive]);
 
   useEffect(() => {
     if (callState.clientConnectionData) {
-      console.log("how long", performance.now);
       flagRef.current = true;
       peer1.current?.signal(callState.clientConnectionData);
       peer1.current?.on("stream", (stream) => {
-        console.log("How much you you");
         if (document.querySelector("audio")) {
           document.querySelector("audio")?.remove();
         }
@@ -41,24 +44,28 @@ export const CallModal = ({}: ICallModal) => {
     }
   }, [callState.clientConnectionData]);
 
-  const dismissAll = () => {    
+  const dismissAll = () => {
     if (audioEle.current) {
       audioEle.current.pause();
       audioEle.current.srcObject = null;
       audioEle.current.remove();
       audioEle.current = null;
+      console.log("Audio Dismisal");
     }
 
     if (streamRef.current) {
+      if (peer1.current) {
+        peer1.current.removeStream(streamRef.current);
+        peer1.current.removeAllListeners();
+        peer1.current.destroy();
+        peer1.current = null;
+        console.log("Peer1 Dismisal");
+      }
       streamRef.current.getTracks().forEach((track) => {
         track.stop();
       });
-
       streamRef.current = null;
-    }
-    if (peer1.current) {
-      peer1.current.destroy();
-      peer1.current = null;
+      console.log("Stream Dismisal");
     }
   };
   const setVisible = (visible: boolean) => {
@@ -107,6 +114,7 @@ export const CallModal = ({}: ICallModal) => {
       visible={callState.callModal}
       setVisible={setVisible}
       title="Initiating Call"
+      disableOutsideClick
     >
       {callState.callInitiateLoading ? (
         <Button text={"Accept Call"} onClick={handleAcceptCall} />

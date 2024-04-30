@@ -8,7 +8,7 @@ const constraints: MediaStreamConstraints = {
 };
 
 export const useCallActive = (callState: callStateType) => {
-  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const peer2 = useRef<Peer.Instance | null>(null);
   const audioEle = useRef<HTMLAudioElement | null>(null);
   const onClientConnectionData = useClientStore(
@@ -20,25 +20,37 @@ export const useCallActive = (callState: callStateType) => {
       audioEle.current.pause();
       audioEle.current.srcObject = null;
       audioEle.current.remove();
+      audioEle.current = null;
+      if (document.querySelector("audio")) {
+        document.querySelector("audio")?.remove();
+      }
+      console.log("Audio Dismisal");
     }
-    if (audioStream) {
-      audioStream.getTracks().forEach((track) => {
+    if (streamRef.current) {
+      if (peer2.current) {
+        peer2.current.removeStream(streamRef.current);
+        peer2.current.removeAllListeners();
+        peer2.current.destroy();
+        peer2.current = null;
+        console.log("Peer2 Dismisal");
+      }
+
+      streamRef.current.getTracks().forEach((track) => {
         track.stop();
       });
-      setAudioStream(null);
-    }
-    if (peer2.current) {
-      peer2.current.destroy();
+      streamRef.current = null;
+      console.log("Stream Dismisal");
     }
   };
   useEffect(() => {
     if (callState.callActive) {
+      console.log("How many time i run", performance.now())
       try {
         navigator.mediaDevices
           .getUserMedia(constraints)
           .then((stream) => {
             // Handle the media stream as needed.
-            setAudioStream(stream);
+            streamRef.current = stream;
             let peer = new Peer({ stream });
             peer2.current = peer;
             peer.signal(callState.employeeConnectionData);
@@ -61,6 +73,11 @@ export const useCallActive = (callState: callStateType) => {
         console.log(err);
       }
     }
+    return () => {
+      if (callState.callActive) {
+        dismissAll();
+      }
+    };
   }, [callState.callActive]);
   return { dismissAll };
 };

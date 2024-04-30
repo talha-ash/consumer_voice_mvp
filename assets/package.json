@@ -11,8 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@tanstack/react-query": "^5.29.2",
-    "axios": "^1.6.8",
-    "events": "^3.3.0",
+    "axios": "^1.6.8",   
     "immer": "^10.0.4",
     "phoenix": "link:../deps/phoenix",
     "phoenix_html": "link:../deps/phoenix_html",
@@ -39,6 +38,8 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5",
-    "typescript-plugin-css-modules": "^5.1.0"
+    "typescript-plugin-css-modules": "^5.1.0",
+    "events": "^3.3.0",
+    "process": "^0.11.10"
   }
 }

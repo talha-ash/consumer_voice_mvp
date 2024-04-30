@@ -1,3 +1,4 @@
+import "../shared/setup"
 import { createRoot } from "react-dom/client";
 import "../shared/userSocket";
 import EmployeeApp from "./EmployeeApp";

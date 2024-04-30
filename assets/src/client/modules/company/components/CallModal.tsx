@@ -29,6 +29,7 @@ export const CallModal = ({}: ICallModal) => {
       visible={callState.callModal}
       setVisible={(visible: boolean) => setVisible(visible)}
       title="Initiating Call"
+      disableOutsideClick
     >
       {callState.callInitiateLoading ? <Spinner /> : null}
       {callState.callActive ? (
