@@ -1,4 +1,5 @@
 import { IUser, companyStatusType } from "@/shared/types";
+import Peer from "simple-peer";
 import {
   EMPLOYEE_STATUS_BUSY,
   EMPLOYEE_STATUS_OFFLINE,
@@ -14,4 +15,13 @@ export type companyStateType = {
   onlineEmployeesList: IUser[];
   idleEmployees: number;
   clientQueue: IUser[];
+};
+
+export type callStateType = {
+  callInitiateLoading: boolean;
+  callActive: boolean;
+  callClient: IUser | null;
+  callModal: boolean;
+  clientConnectionData: Peer.SignalData | null;
+  employeeConnectionData: Peer.SignalData | null;
 };

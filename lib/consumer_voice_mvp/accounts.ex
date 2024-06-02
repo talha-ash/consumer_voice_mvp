@@ -4,7 +4,7 @@ defmodule ConsumerVoiceMvp.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias ConsumerVoiceMvp.Repo
+  alias ConsumerVoiceMvp.{Repo, Companies}
 
   alias ConsumerVoiceMvp.Accounts.{User, UserToken, UserNotifier, Company}
 
@@ -78,6 +78,7 @@ defmodule ConsumerVoiceMvp.Accounts do
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
+    |> add_online_employee
   end
 
   @doc """
@@ -373,4 +374,13 @@ defmodule ConsumerVoiceMvp.Accounts do
 
   """
   def get_company(id), do: Repo.get(Company, id)
+
+  defp add_online_employee(user) do
+    if user.company_id do
+      Companies.create_employee(%{
+        employee_id: user.id,
+        company_id: user.company_id
+      })
+    end
+  end
 end

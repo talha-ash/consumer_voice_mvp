@@ -4,7 +4,7 @@ import { useEmployeeCompanyStore } from "../stores/employeeCompanyStore";
 
 const Home = () => {
   const companyState = useEmployeeCompanyStore(
-    (state) => state.data.companyState
+    (state) => state.data.companyState,
   );
   const onlineEmployeesList = companyState.onlineEmployeesList;
   return (

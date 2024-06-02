@@ -116,7 +116,6 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({@employee_drop_call_decoded, params}, state) do
-    IO.inspect("handle_cast employee_drop_call_decoded")
     {employee_id, client_id} = params
 
     state = CompanyServerData.on_drop_call(state, client_id, employee_id)

@@ -1,5 +1,4 @@
 defmodule ConsumerVoiceMvp.Const do
-  # Michal's snippet:
   values = [
     initialization_completed: "Initialization completed",
     client_company_topic: "client:company:",
@@ -8,6 +7,7 @@ defmodule ConsumerVoiceMvp.Const do
     client_topic: "client:",
     employee_status_idle: :idle,
     employee_status_busy: :busy,
+    employee_status_in_call: :in_call,
     employee_status_offline: :offline,
     company_status_available: :available,
     company_status_busy: :busy,
@@ -16,8 +16,9 @@ defmodule ConsumerVoiceMvp.Const do
 
     # call statuses
     call_status_initiated: :initiated,
-    call_status_ative: :ative,
+    call_status_active: :ative,
     call_status_ended: :ended,
+    call_status_waiting: :waiting,
 
     # en event names
     br_ev_company_state_update: "br_ev_company_state_update",

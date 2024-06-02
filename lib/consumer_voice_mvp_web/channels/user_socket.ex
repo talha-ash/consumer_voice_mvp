@@ -15,7 +15,7 @@ defmodule ConsumerVoiceMvpWeb.UserSocket do
   @client_company_topic Const.encode(:client_company_topic)
   @employee_company_topic Const.encode(:employee_company_topic)
 
-  #Todo remove order matter condition
+  # Todo remove order matter condition
   channel "#{@client_company_topic}*", ConsumerVoiceMvpWeb.ClientCompanyChannel
   channel "#{@employee_company_topic}*", ConsumerVoiceMvpWeb.EmployeeCompanyChannel
   channel "client:*", ConsumerVoiceMvpWeb.ClientChannel

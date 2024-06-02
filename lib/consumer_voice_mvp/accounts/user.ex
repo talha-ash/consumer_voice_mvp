@@ -12,7 +12,7 @@ defmodule ConsumerVoiceMvp.Accounts.User do
     field :role, Ecto.Enum, values: [:admin, :client, :employee]
     field :status, :string, virtual: true
 
-    belongs_to :company, ConsumerVoiceMvp.Accounts.Company
+    belongs_to :company, ConsumerVoiceMvp.Companies.Company
     timestamps(type: :utc_datetime)
   end
 

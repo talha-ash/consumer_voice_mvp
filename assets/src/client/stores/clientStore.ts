@@ -104,7 +104,6 @@ export const useClientStore = create(
         }),
       onClientConnectionData: (connectionData: Peer.SignalData) =>
         set((state) => {
-          console.log("state.data.callState", state.data.callState);
           state.data.clientChannel.sendClientConnectionData({
             connection_data: connectionData,
             employee_id: state.data.callState.employeeId,

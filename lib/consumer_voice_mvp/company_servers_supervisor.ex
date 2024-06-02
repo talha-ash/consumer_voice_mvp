@@ -2,7 +2,7 @@ defmodule ConsumerVoiceMvp.CompanyServersSupervisor do
   use DynamicSupervisor
   alias ConsumerVoiceMvp.CompanyServer
   alias ConsumerVoiceMvp.Repo
-  alias ConsumerVoiceMvp.Accounts.Company
+  alias ConsumerVoiceMvp.Companies.Company
 
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)

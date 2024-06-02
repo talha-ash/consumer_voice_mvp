@@ -10,7 +10,8 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias ConsumerVoiceMvp.{Accounts, Repo}
+alias ConsumerVoiceMvp.{Repo}
+alias ConsumerVoiceMvp.Companies
 
 # Create a Companies
 companies = [
@@ -41,9 +42,9 @@ companies = [
   }
 ]
 
-Repo.delete_all(Accounts.Company)
+Repo.delete_all(Companies.Company)
 
 Repo.insert_all(
-  Accounts.Company,
+  Companies.Company,
   companies
 )

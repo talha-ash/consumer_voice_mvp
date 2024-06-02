@@ -4,6 +4,7 @@ defmodule ConsumerVoiceMvp.Repo.Migrations.AddCompaniesTable do
   def change do
     create table(:companies) do
       add :name, :string, null: false
+      add :status, :boolean, null: false, default: false
 
       timestamps(type: :utc_datetime)
     end

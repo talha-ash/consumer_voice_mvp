@@ -13,6 +13,7 @@ defmodule ConsumerVoiceMvp.Application do
       {DNSCluster,
        query: Application.get_env(:consumer_voice_mvp, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ConsumerVoiceMvp.PubSub},
+      ConsumerVoiceMvpWeb.Presence,
       # Start the Finch HTTP client for sending emails
       {Finch, name: ConsumerVoiceMvp.Finch},
       {Registry, keys: :unique, name: ConsumerVoiceMvp.CompanyRegistry},

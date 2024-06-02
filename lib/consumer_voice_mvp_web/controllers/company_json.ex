@@ -1,5 +1,5 @@
 defmodule ConsumerVoiceMvpWeb.CompanyJSON do
-  alias ConsumerVoiceMvp.Accounts.Company
+  alias ConsumerVoiceMvp.Companies.Company
 
   @doc """
   Renders a list of companies.
