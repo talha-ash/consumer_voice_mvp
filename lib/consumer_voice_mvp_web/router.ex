@@ -9,9 +9,9 @@ defmodule ConsumerVoiceMvpWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, html: {ConsumerVoiceMvpWeb.Layouts, :root}
     plug :protect_from_forgery
-    # plug :put_secure_browser_headers
-    # plug :fetch_current_user
-    # plug :put_user_token
+    plug :put_secure_browser_headers
+    plug :fetch_current_user
+    plug :put_user_token
   end
 
   pipeline :api do

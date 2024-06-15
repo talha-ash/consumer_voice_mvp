@@ -1,25 +1,20 @@
+import mitt, { Emitter } from "mitt";
 import { Channel } from "phoenix";
-import socket from "../../shared/userSocket";
-import { onlineStatusType } from "../../shared/types";
+import Peer from "simple-peer";
 import {
   BR_EN_CALL_DROP,
   BR_EN_ON_CALL_ACTIVE,
   CLIENT_CONNECTION_DATA,
   CLIENT_DROP_CALL,
 } from "../../shared/constants";
-import Peer from "simple-peer";
-interface ChannelActions {
-  setUserStatus: (status: onlineStatusType) => void;
-  onCallActive: (
-    employeeId: string,
-    employeeConnectionData: Peer.SignalData
-  ) => void;
-  onEmployeeDropCall: () => void;
-}
+import socket from "../../shared/userSocket";
+import { useClientStore } from "../stores/clientStore";
 
 export class ClientChannel {
   channel: Channel;
-  constructor(userId: string, public actions: ChannelActions) {
+  emitter: ClientChannelEmitter = mitt();
+  eventsKeys = [BR_EN_ON_CALL_ACTIVE, BR_EN_CALL_DROP] as const;
+  constructor(userId: string) {
     this.channel = socket.channel(`client:${userId}`, {});
     this.channel
       .join()
@@ -30,6 +25,17 @@ export class ClientChannel {
       .receive("error", (resp) => {
         console.log("Unable to join", resp);
       });
+    this.#addDefaultObservers();
+  }
+  attachedStoreEvents(eventsToAttached: Array<AttachedClientChannelEvent>) {
+    eventsToAttached.map(([key, callback]) => {
+      this.emitter.on(key, callback);
+    });
+  }
+  removeStoreEvents(eventsToAttached: Array<AttachedClientChannelEvent>) {
+    eventsToAttached.map(([key, callback]) => {
+      this.emitter.off(key, callback);
+    });
   }
 
   dropCall(companyId: string, employeeId: string) {
@@ -48,12 +54,29 @@ export class ClientChannel {
   }
   handleEvents() {
     this.channel.on(BR_EN_ON_CALL_ACTIVE, (message) => {
-      const { employee_id, employee_connection_data } = message;
-      this.actions.onCallActive(employee_id, employee_connection_data);
+      this.emitter.emit(BR_EN_ON_CALL_ACTIVE, message);
     });
-
     this.channel.on(BR_EN_CALL_DROP, () => {
-      this.actions.onEmployeeDropCall();
+      this.emitter.emit(BR_EN_CALL_DROP);
     });
   }
+  #addDefaultObservers() {
+    const clientStoreObserver =
+      useClientStore.getState().actions.clientStoreObserver;
+    clientStoreObserver(this.emitter);
+  }
 }
+
+type ClientChannelEvent = {
+  [BR_EN_ON_CALL_ACTIVE]: {
+    employee_id: string;
+    employee_connection_data: Peer.SignalData;
+  };
+  [BR_EN_CALL_DROP]: void;
+};
+
+export type AttachedClientChannelEvent = [
+  keyof ClientChannelEvent,
+  (message: ClientChannelEvent[keyof ClientChannelEvent]) => void
+];
+export type ClientChannelEmitter = Emitter<ClientChannelEvent>;

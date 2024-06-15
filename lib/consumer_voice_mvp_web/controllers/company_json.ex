@@ -12,7 +12,8 @@ defmodule ConsumerVoiceMvpWeb.CompanyJSON do
   Renders a single company.
   """
   def show(%{company: company}) do
-    %{data: data(company)}
+    company = company |> data |> Map.put(:status, company.status)
+    %{data: company}
   end
 
   defp data(%Company{} = company) do

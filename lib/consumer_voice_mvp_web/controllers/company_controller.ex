@@ -1,12 +1,13 @@
 defmodule ConsumerVoiceMvpWeb.CompanyController do
   use ConsumerVoiceMvpWeb, :controller
 
+  alias ConsumerVoiceMvp.Companies
   alias ConsumerVoiceMvp.Accounts
 
   action_fallback ConsumerVoiceMvpWeb.FallbackController
 
   def index(conn, _params) do
-    companies = Accounts.list_companies()
+    companies = Companies.list_companies()
     render(conn, :index, companies: companies)
   end
 
@@ -20,7 +21,10 @@ defmodule ConsumerVoiceMvpWeb.CompanyController do
   # end
 
   def show(conn, %{"id" => id}) do
-    company = Accounts.get_company(id)
+    company = Companies.get_company(id)
+    status = Companies.get_company_status(company.id)
+    company = Map.put(company, :status, status)
+    IO.inspect(company)
     render(conn, :show, company: company)
   end
 

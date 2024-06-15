@@ -1,7 +1,7 @@
 defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
   use ConsumerVoiceMvpWeb, :live_view
 
-  alias ConsumerVoiceMvp.Accounts
+  alias ConsumerVoiceMvp.{Accounts, Companies}
   alias ConsumerVoiceMvp.Accounts.User
 
   def render(assigns) do
@@ -62,7 +62,7 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
 
   def mount(_params, _session, socket) do
     changeset = Accounts.change_user_registration(%User{})
-    companies = Accounts.list_companies()
+    companies = Companies.list_companies()
 
     socket =
       socket
@@ -78,17 +78,18 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    case Accounts.register_user(user_params) do
-      {:ok, user} ->
-        {:ok, _} =
-          Accounts.deliver_user_confirmation_instructions(
-            user,
-            &url(~p"/users/confirm/#{&1}")
-          )
+    # @todo "Handle company_id for employee registration"
+    with {:ok, user} <- Accounts.register_user(user_params),
+         {:ok, _} <- Accounts.add_online_employee(user) do
+      {:ok, _} =
+        Accounts.deliver_user_confirmation_instructions(
+          user,
+          &url(~p"/users/confirm/#{&1}")
+        )
 
-        changeset = Accounts.change_user_registration(user)
-        {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
-
+      changeset = Accounts.change_user_registration(user)
+      {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
         socket = assign_is_employee(socket, user_params["role"])
         {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}

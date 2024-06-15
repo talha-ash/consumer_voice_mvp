@@ -1,5 +1,5 @@
 import { COMPANY_STATUS_OFFLINE } from "@/shared/constants";
-import { IUser } from "@/shared/types";
+
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { EmployeeCompanyChannel } from "../channels";
@@ -14,8 +14,6 @@ interface IEmployeeCompanyStore {
   data: employeeCompanyStoreType;
   actions: {
     onCompanyStateUpdate: (companyState: companyStateType) => void;
-    createEmployeeCompanyChannel: (employee: IUser) => void;
-    removeEmployeeCompanyChannel: () => void;
   };
 }
 
@@ -40,18 +38,6 @@ export const useEmployeeCompanyStore = create(
               idleEmployees: companyState.idle_employees,
               clientQueue: companyState.client_queue,
             };
-          }),
-        createEmployeeCompanyChannel: (employee: IUser) =>
-          set((state) => {
-            state.data.employeeCompanyChannel = new EmployeeCompanyChannel(
-              employee.id,
-              employee.companyId!,
-              { onCompanyStateUpdate: state.actions.onCompanyStateUpdate }
-            );
-          }),
-        removeEmployeeCompanyChannel: () =>
-          set((state) => {
-            state.data.employeeCompanyChannel = null;
           }),
       },
     };

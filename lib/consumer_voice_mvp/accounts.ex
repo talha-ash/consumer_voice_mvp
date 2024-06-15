@@ -4,6 +4,7 @@ defmodule ConsumerVoiceMvp.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias ConsumerVoiceMvp.Helpers
   alias ConsumerVoiceMvp.{Repo, Companies}
 
   alias ConsumerVoiceMvp.Accounts.{User, UserToken, UserNotifier, Company}
@@ -60,6 +61,23 @@ defmodule ConsumerVoiceMvp.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  @doc """
+  Gets a single user map without meta and company fields.
+
+  Raises `Ecto.NoResultsError` if the User does not exist.
+
+  ## Examples
+
+      iex> get_user_map!(123)
+      %{id: 1, ...}
+
+      iex> get_user_map!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+
+  def get_user_map!(id), do: Repo.get!(User, id) |> Helpers.struct_to_map_drop([:meta, :company])
+
   ## User registration
 
   @doc """
@@ -78,7 +96,6 @@ defmodule ConsumerVoiceMvp.Accounts do
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
-    |> add_online_employee
   end
 
   @doc """
@@ -353,34 +370,26 @@ defmodule ConsumerVoiceMvp.Accounts do
   end
 
   @doc """
-  List All Companies.
+  Craete Online Employee Data on employee registration
 
   ## Examples
 
-      iex> list_companies()
+      iex> add_online_employee(user)
+      {:ok, %OnlineEmployee{}}
+
+      iex> add_online_employee(user)
+      {:error, %Ecto.Changeset{}}
+
   """
-  def list_companies() do
-    Repo.all(Company)
+
+  def add_online_employee(%{company_id: company_id} = user) when is_number(company_id) do
+    Companies.create_employee(%{
+      employee_id: user.id,
+      company_id: user.company_id
+    })
   end
 
-  @doc """
-  Gets a single company.
-
-
-  ## Examples
-
-      iex> get_company!(123)
-      %Company{}
-
-  """
-  def get_company(id), do: Repo.get(Company, id)
-
-  defp add_online_employee(user) do
-    if user.company_id do
-      Companies.create_employee(%{
-        employee_id: user.id,
-        company_id: user.company_id
-      })
-    end
+  def add_online_employee(user) do
+    {:ok, user}
   end
 end

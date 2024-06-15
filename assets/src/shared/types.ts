@@ -22,6 +22,10 @@ export type IUser = {
 export interface ICompany {
   name: string;
   id: string;
+  status:
+    | typeof constants.COMPANY_STATUS_AVAILABLE
+    | typeof constants.COMPANY_STATUS_OFFLINE
+    | typeof constants.COMPANY_STATUS_BUSY;
 }
 
 export type roleType =

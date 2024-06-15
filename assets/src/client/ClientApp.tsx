@@ -1,21 +1,24 @@
 import { useClientStore } from "./stores/clientStore";
-import { Link, Route, Switch } from "wouter";
+import { Route, Switch } from "wouter";
 import { Home, Company } from "./screens";
+import { ClientChannelStoreProvider } from "./stores/clientChannelStore";
 const ClientApp = () => {
-  const client = useClientStore((state) => state.data.client);
+  const clientId = useClientStore((state) => state.data.client.id);
 
   return (
     <div>
-      <Switch>
-        <Route path="/" component={Home} />
+      <ClientChannelStoreProvider userId={clientId}>
+        <Switch>
+          <Route path="/" component={Home} />
 
-        <Route path="/company/:id">
-          {(params) => <Company {...params} />}
-        </Route>
+          <Route path="/company/:id">
+            {(params) => <Company {...params} />}
+          </Route>
 
-        {/* Default route in a switch */}
-        <Route>404: No such page!</Route>
-      </Switch>
+          {/* Default route in a switch */}
+          <Route>404: No such page!</Route>
+        </Switch>
+      </ClientChannelStoreProvider>
     </div>
   );
 };

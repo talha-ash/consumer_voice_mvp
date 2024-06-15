@@ -9,7 +9,7 @@ interface ICompanyDetailProps {
 export const Company = ({ id }: ICompanyDetailProps) => {
   const companyQuery = useCompanyQuery(id);
   const client = useClientStore((state) => state.data.client);
-
+  console.log(companyQuery.data);
   return (
     <div className="flex m-5">
       {companyQuery.isLoading && <p>Loading...</p>}

@@ -5,8 +5,10 @@ import { COMPANY_STATUS_AVAILABLE } from "@/shared/constants";
 import { useCreateClientCompanyChannel } from "../hooks";
 import { CallModal } from "./CallModal";
 import { useClientStore } from "@/client/stores/clientStore";
+import { useLocation } from "wouter";
 
 export const CompanyDetail = () => {
+  const navigation = useLocation()[1]
   useCreateClientCompanyChannel();
   const clientCompanyState = useClientCompanyStore(
     (state) => state.data.clientCompanyState
@@ -26,9 +28,10 @@ export const CompanyDetail = () => {
 
   return (
     <div>
+      <button onClick={()=> navigation("/")}>Back</button>
       <h1>Company Info</h1>
       <div className="flex flex-row items-center gap-4">
-        <h1>Name: {clientCompanyState.company.name}</h1>
+        {/* <h1>Name: {clientCompanyState.company.name}</h1> */}
         <ColorStatus status={clientCompanyState.status} />
         {clientCompanyState.status == COMPANY_STATUS_AVAILABLE ? (
           <button

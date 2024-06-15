@@ -1,11 +1,12 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { ClientChannel } from "../channels/clientChannel";
 import { ROLE_EMPLOYEE } from "../../shared/constants";
 import { IUser, onlineStatusType } from "../../shared/types";
 import { getUserData } from "../../shared/utils";
-// import { ClientCompanyChannel } from "../channels";
+
 import Peer from "simple-peer";
+
+import { ClientChannelEmitter } from "../channels/clientChannel";
 interface IClientStore {
   actions: {
     setStatus: (status: onlineStatusType) => void;
@@ -17,13 +18,13 @@ interface IClientStore {
     onInitiateCall: (companyId: string) => void;
     dropCall: () => void;
     onEmployeeDropCall: () => void;
-    onClientConnectionData: (connectionData: Peer.SignalData) => void;
+    clientStoreObserver: (emitter: ClientChannelEmitter) => void;
     // createClientCompanyChannel: (companyId: string) => void;
     // removeClientCompanyChannel: () => void;
   };
   data: {
     client: IUser;
-    clientChannel: ClientChannel;
+    // clientChannel: ClientChannel;
     callState: {
       callModal: boolean;
       callInitiateLoading: boolean;
@@ -54,7 +55,7 @@ export const useClientStore = create(
         employeeConnectionData: null,
         // callClient: null,
       },
-      clientChannel: {} as ClientChannel,
+      // clientChannel: {} as ClientChannel,
       // clientCompanyChannel: null,
     },
     actions: {
@@ -85,10 +86,6 @@ export const useClientStore = create(
         }),
       dropCall: () =>
         set((state) => {
-          state.data.clientChannel.dropCall(
-            state.data.callState.companyId,
-            state.data.callState.employeeId
-          );
           state.data.callState.callActive = false;
           state.data.callState.callInitiateLoading = false;
           state.data.callState.callModal = false;
@@ -102,41 +99,18 @@ export const useClientStore = create(
           state.data.callState.employeeId = "";
           state.data.callState.companyId = "";
         }),
-      onClientConnectionData: (connectionData: Peer.SignalData) =>
+      clientStoreObserver: (emitter: ClientChannelEmitter) =>
         set((state) => {
-          state.data.clientChannel.sendClientConnectionData({
-            connection_data: connectionData,
-            employee_id: state.data.callState.employeeId,
-            company_id: state.data.callState.companyId,
+          const onEmployeeDropCall = state.actions.onEmployeeDropCall;
+          emitter.on("br_en_call_drop", () => {
+            onEmployeeDropCall();
+          });
+          const onCallActive = state.actions.onCallActive;
+          emitter.on("br_en_on_call_active", (message) => {
+            console.log("Not Reach Level 4");
+            onCallActive(message.employee_id, message.employee_connection_data);
           });
         }),
-      // createClientCompanyChannel: (companyId: string) =>
-      //   set((state) => {
-      //     state.data.clientCompanyChannel = new ClientCompanyChannel(
-      //       state.data.client.id,
-      //       companyId,
-      //       {}
-      //     );
-      //   }),
-      // removeClientCompanyChannel: () =>
-      //   set((state) => {
-      //     state.data.clientCompanyChannel?.channel.leave();
-      //     state.data.clientCompanyChannel = null;
-      //   }),
     },
   }))
 );
-
-useClientStore.setState((state) => {
-  return {
-    ...state,
-    data: {
-      ...state.data,
-      clientChannel: new ClientChannel(initialUser.id, {
-        setUserStatus: state.actions.setStatus,
-        onCallActive: state.actions.onCallActive,
-        onEmployeeDropCall: state.actions.onEmployeeDropCall,
-      }),
-    },
-  };
-});

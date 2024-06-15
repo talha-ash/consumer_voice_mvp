@@ -16,7 +16,7 @@ defmodule ConsumerVoiceMvp.Const do
 
     # call statuses
     call_status_initiated: :initiated,
-    call_status_active: :ative,
+    call_status_active: :active,
     call_status_ended: :ended,
     call_status_waiting: :waiting,
 

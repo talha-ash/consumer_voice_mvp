@@ -3,9 +3,8 @@ import { useEmployeeStore } from "../stores/employeeStore";
 import { useEffect, useRef } from "react";
 
 import { useActiveCall } from "../hooks";
-interface ICallModal {}
 
-export const CallModal = ({}: ICallModal) => {
+export const CallModal = () => {
   const callState = useEmployeeStore((state) => state.data.callState);
   const { dismissAll, initCall, handleAcceptCall, handleDropCall } =
     useActiveCall();

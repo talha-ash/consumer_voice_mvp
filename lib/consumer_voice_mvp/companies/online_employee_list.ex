@@ -16,7 +16,7 @@ defmodule ConsumerVoiceMvp.Companies.Online_Employee do
     field :employee_id, :integer
 
     belongs_to :users, Accounts.User, foreign_key: :employee_id, define_field: false
-    belongs_to :companies, Company
+    belongs_to :companies, Company, foreign_key: :company_id
     timestamps(type: :utc_datetime)
   end
 

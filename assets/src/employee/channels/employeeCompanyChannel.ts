@@ -1,19 +1,23 @@
+import mitt, { Emitter } from "mitt";
 import { Channel } from "phoenix";
+import Peer from "simple-peer";
 import socket from "../../shared/userSocket";
-import { EMPLOYEE_COMPANY_TOPIC, EN_COMPANY_STATE_UPDATE } from "../constants";
+import {
+  EMPLOYEE_ACCEPT_CALL,
+  EMPLOYEE_COMPANY_TOPIC,
+  EMPLOYEE_DROP_CALL,
+  EN_COMPANY_STATE_UPDATE,
+} from "../constants";
 import { companyStateType } from "../type";
-
 interface ChannelActions {
   onCompanyStateUpdate: (companyState: companyStateType) => void;
 }
 
 export class EmployeeCompanyChannel {
   channel: Channel;
-  constructor(
-    employeeId: string,
-    companyId: string,
-    public actions: ChannelActions
-  ) {
+  emitter: EmployeeCompanyChannelEmitter = mitt();
+  eventsKeys = [EN_COMPANY_STATE_UPDATE] as const;
+  constructor(employeeId: string, companyId: string) {
     this.channel = socket.channel(`${EMPLOYEE_COMPANY_TOPIC}${companyId}`, {
       employeeId,
     });
@@ -26,14 +30,56 @@ export class EmployeeCompanyChannel {
       .receive("error", (resp) => {
         console.log("Unable to join", resp);
       });
+    this.addDefaultObservers();
+  }
+
+  attachedStoreEvents(
+    eventsToAttached: Array<EmployeeCompanyChannelAttachedEvent>
+  ) {
+    eventsToAttached.map(([key, callback]) => {
+      this.emitter.on(key, callback);
+    });
+  }
+  removeStoreEvents(
+    eventsToAttached: Array<EmployeeCompanyChannelAttachedEvent>
+  ) {
+    eventsToAttached.map(([key, callback]) => {
+      this.emitter.off(key, callback);
+    });
+  }
+
+  sendAcceptCall(clientId: string, employeeConnectionData: Peer.SignalData) {
+    this.channel.push(EMPLOYEE_ACCEPT_CALL, {
+      client_id: clientId,
+      employee_connection_data: employeeConnectionData,
+    });
+  }
+
+  sendDropCall(clientId: string) {
+    this.channel.push(EMPLOYEE_DROP_CALL, { client_id: clientId });
   }
 
   handleEvents() {
     this.channel.on(
       EN_COMPANY_STATE_UPDATE,
       (companyState: companyStateType) => {
-        this.actions.onCompanyStateUpdate(companyState);
+        this.emitter.emit(EN_COMPANY_STATE_UPDATE, companyState);
+        // this.actions.onCompanyStateUpdate(companyState);
       }
     );
   }
+  addDefaultObservers() {}
 }
+
+type EmployeeCompanyChannelEvent = {
+  [EN_COMPANY_STATE_UPDATE]: companyStateType;
+};
+
+export type EmployeeCompanyChannelAttachedEvent = [
+  keyof EmployeeCompanyChannelEvent,
+  (
+    message: EmployeeCompanyChannelEvent[keyof EmployeeCompanyChannelEvent]
+  ) => void
+];
+export type EmployeeCompanyChannelEmitter =
+  Emitter<EmployeeCompanyChannelEvent>;

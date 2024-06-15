@@ -33,6 +33,7 @@ export class ClientCompanyChannel {
   }
   handleEvents() {
     this.channel.on(EN_COMPANY_STATE_UPDATE, (message) => {
+      console.log(message)
       this.actions.onClientCompanyStateUpdate(message);
     });
   }

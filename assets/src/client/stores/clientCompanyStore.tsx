@@ -39,8 +39,8 @@ export const ClientCompanyStoreProvider = ({
         const state: IClientCompanyStore = {
           data: {
             clientCompanyState: {
-              status: COMPANY_STATUS_OFFLINE,
-              company: {} as ICompany,
+              status: company.status,
+              company,
               clientQueue: [],
             },
             clientCompanyChannel: null,
@@ -48,11 +48,10 @@ export const ClientCompanyStoreProvider = ({
           actions: {
             onClientCompanyStateUpdate: (clientCompanyState: any) =>
               set((state) => {
-                state.data.clientCompanyState = {
-                  status: clientCompanyState.status,
-                  company: clientCompanyState.company,
-                  clientQueue: clientCompanyState.client_queue,
-                };
+                state.data.clientCompanyState.status =
+                  clientCompanyState.status;
+
+                // clientQueue: clientCompanyState.client_queue,
               }),
             createClientCompanyChannel: () =>
               set((state) => {
@@ -70,7 +69,7 @@ export const ClientCompanyStoreProvider = ({
                 state.data.clientCompanyChannel?.channel.leave();
                 state.data.clientCompanyChannel = null;
               }),
-              initiateCompanyCall: () =>
+            initiateCompanyCall: () =>
               set((state) => {
                 state.data.clientCompanyChannel?.initiateCompanyCall();
               }),

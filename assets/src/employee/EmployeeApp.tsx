@@ -1,17 +1,26 @@
 import { Home } from "./screens/Home";
 import { useEmployeeStore } from "./stores/employeeStore";
 
-import { useCreateEmployeeCompanyChannel } from "./hooks";
+import { EmployeeChannelStoreProvider } from "./stores/employeChannelStore";
+import { EmployeeCompanyChannelStoreProvider } from "./stores/employeCompanyChannelStore";
 
 const EmployeeApp = () => {
   const employee = useEmployeeStore((state) => state.data.employee);
-  useCreateEmployeeCompanyChannel(employee);
 
   if (!employee.id) {
     return null;
   }
 
-  return <Home />;
+  return (
+    <EmployeeChannelStoreProvider userId={employee.id}>
+      <EmployeeCompanyChannelStoreProvider
+        userId={employee.id}
+        companyId={employee.companyId!}
+      >
+        <Home />
+      </EmployeeCompanyChannelStoreProvider>
+    </EmployeeChannelStoreProvider>
+  );
 };
 
 export default EmployeeApp;

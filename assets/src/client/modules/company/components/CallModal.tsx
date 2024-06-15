@@ -1,6 +1,7 @@
 import { useClientStore } from "@/client/stores/clientStore";
 import { Button, Modal, Spinner } from "@/shared/components";
 import { useCallActive } from "../hooks";
+import { useClientChannelStore } from "@/client/stores/clientChannelStore";
 
 interface ICallModal {}
 
@@ -10,9 +11,13 @@ export const CallModal = ({}: ICallModal) => {
     (state) => state.actions.toggleCallModal
   );
   const dropCall = useClientStore((state) => state.actions.dropCall);
+  const sendDropCall = useClientChannelStore(
+    (state) => state.actions.senDropCall
+  );
   const { dismissAll } = useCallActive(callState);
 
   const handleDropCall = () => {
+    sendDropCall(callState.companyId, callState.employeeId);
     dropCall();
     dismissAll();
   };
