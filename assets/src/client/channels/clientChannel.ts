@@ -57,6 +57,7 @@ export class ClientChannel {
       this.emitter.emit(BR_EN_ON_CALL_ACTIVE, message);
     });
     this.channel.on(BR_EN_CALL_DROP, () => {
+      console.log("Call Droper")
       this.emitter.emit(BR_EN_CALL_DROP);
     });
   }

@@ -122,6 +122,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
     case CompanyServerData.on_drop_call({:employee, employee_id, state.company.id}) do
       {:ok, _call} ->
+        IO.inspect(client_id, label: "Client ID")
         broadcast_employee_call_drop(client_id)
         {:noreply, state}
 

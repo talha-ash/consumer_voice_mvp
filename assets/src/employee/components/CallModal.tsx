@@ -47,6 +47,7 @@ export const CallModal = () => {
       title="Initiating Call"
       disableOutsideClick
     >
+      <h1>Client ID{callState.callClient?.id}</h1>
       {callState.callInitiateLoading ? (
         <Button text={"Accept Call"} onClick={handleAcceptCall} />
       ) : null}

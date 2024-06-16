@@ -56,6 +56,7 @@ export class EmployeeCompanyChannel {
   }
 
   sendDropCall(clientId: string) {
+  console.log("sendDropCall", clientId);
     this.channel.push(EMPLOYEE_DROP_CALL, { client_id: clientId });
   }
 

@@ -6,9 +6,13 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
   use Phoenix.Channel
 
   @employee_company_topic Const.encode(:employee_company_topic)
+
   @employee_status_idle Const.encode(:employee_status_idle)
+  @employee_status_busy Const.encode(:employee_status_busy)
+
   @employee_accept_call Const.encode(:employee_accept_call)
   @employee_accept_call_decoded Const.decode("employee_accept_call")
+
   @employee_drop_call Const.encode(:employee_drop_call)
   @employee_drop_call_decoded Const.decode("employee_drop_call")
 
@@ -59,6 +63,10 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
       {@employee_accept_call_decoded, {employee_id, client_id, employee_connection_data}}
     )
 
+    Presence.update(socket, employee_id, fn current ->
+      Map.put(current, :status, @employee_status_busy)
+    end)
+
     {:noreply, socket}
   end
 
@@ -70,6 +78,10 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
       server_pid,
       {@employee_drop_call_decoded, {employee_id, client_id}}
     )
+
+    Presence.update(socket, employee_id, fn current ->
+      Map.put(current, :status, @employee_status_idle)
+    end)
 
     {:noreply, socket}
   end

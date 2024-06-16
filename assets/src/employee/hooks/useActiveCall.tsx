@@ -94,7 +94,7 @@ export const useActiveCall = () => {
   const handleDropCall = () => {
     dismissAll();
     dropCall();
-    sendDropCall(employee.companyId!, employee.id);
+    sendDropCall(callState.callClient?.id!);
   };
 
   return { dismissAll, initCall, handleAcceptCall, handleDropCall };
