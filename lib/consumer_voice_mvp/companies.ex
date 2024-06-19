@@ -34,21 +34,21 @@ defmodule ConsumerVoiceMvp.Companies do
   def get_company(id), do: Repo.get(Companies.Company, id)
 
   def create_employee(attrs) do
-    %Companies.Online_Employee{}
-    |> Companies.Online_Employee.creation_changeset(attrs)
+    %Companies.Employee{}
+    |> Companies.Employee.creation_changeset(attrs)
     |> Repo.insert()
   end
 
   def get_company_employees(company_id) do
     query =
-      from c in Companies.Online_Employee,
+      from c in Companies.Employee,
         where: c.company_id == ^company_id,
         select: c
 
     Repo.all(query)
   end
 
-  def get_busy_online_employee(company_id) do
+  def find_and_busy_employee(company_id) do
     employee = get_idle_employee(company_id)
 
     if employee do
@@ -60,7 +60,7 @@ defmodule ConsumerVoiceMvp.Companies do
 
   def get_company_online_employees(company_id) do
     query =
-      from c in Companies.Online_Employee,
+      from c in Companies.Employee,
         where: c.company_id == ^company_id and c.status != @employee_status_offline,
         select: c
 
@@ -84,7 +84,7 @@ defmodule ConsumerVoiceMvp.Companies do
 
   def get_company_idle_employees(company_id) do
     query =
-      from c in Companies.Online_Employee,
+      from c in Companies.Employee,
         where: c.company_id == ^company_id and c.status == @employee_status_idle,
         select: c
 
@@ -98,7 +98,7 @@ defmodule ConsumerVoiceMvp.Companies do
 
   def get_company_offline_employees(company_id) do
     query =
-      from c in Companies.Online_Employee,
+      from c in Companies.Employee,
         where: c.company_id == ^company_id and c.status == @employee_status_offline,
         select: c
 
@@ -109,18 +109,18 @@ defmodule ConsumerVoiceMvp.Companies do
     employee = get_employee_by_company(employee_id, company_id)
 
     employee
-    |> Companies.Online_Employee.update_changeset(%{status: status})
+    |> Companies.Employee.update_changeset(%{status: status})
     |> Repo.update()
   end
 
   def update_employee_status(employee, status) do
     employee
-    |> Companies.Online_Employee.update_changeset(%{status: status})
+    |> Companies.Employee.update_changeset(%{status: status})
     |> Repo.update()
   end
 
   def get_employee!(id) do
-    Repo.get!(Companies.Online_Employee, id)
+    Repo.get!(Companies.Employee, id)
   end
 
   @doc """
@@ -138,12 +138,21 @@ defmodule ConsumerVoiceMvp.Companies do
   """
   # Rethink code design accessing Account context things
   def get_employee_map!(id),
-    do: Repo.get!(Accounts.User, id) |> Helpers.struct_to_map_drop([:meta, :company])
+    do: Repo.get!(Companies.Employee, id) |> Helpers.struct_to_map_drop([:meta, :company, :user])
 
   def get_employee_by_company(employee_id, company_id) do
     query =
-      from c in Companies.Online_Employee,
-        where: c.employee_id == ^employee_id and c.company_id == ^company_id,
+      from c in Companies.Employee,
+        where: c.id == ^employee_id and c.company_id == ^company_id,
+        select: c
+
+    Repo.one(query)
+  end
+
+  def get_employee_by_user(user_id, company_id) do
+    query =
+      from c in Companies.Employee,
+        where: c.user_id == ^user_id and c.company_id == ^company_id,
         select: c
 
     Repo.one(query)
@@ -151,7 +160,7 @@ defmodule ConsumerVoiceMvp.Companies do
 
   def get_idle_employee(company_id) do
     query =
-      from c in Companies.Online_Employee,
+      from c in Companies.Employee,
         where: c.company_id == ^company_id and c.status == @employee_status_idle,
         limit: 1,
         select: c

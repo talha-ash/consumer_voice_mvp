@@ -39,11 +39,11 @@ interface IEmployeeCompanyChannelStore {
 
 export const EmployeeCompanyChannelStoreProvider = ({
   children,
-  userId,
+  employeeId,
   companyId,
 }: {
   children: React.ReactNode;
-  userId: string;
+  employeeId: string;
   companyId: string;
 }) => {
   const [store] = useState(() =>
@@ -52,7 +52,7 @@ export const EmployeeCompanyChannelStoreProvider = ({
         const state: IEmployeeCompanyChannelStore = {
           data: {
             employeeCompanyChannel: new EmployeeCompanyChannel(
-              userId,
+              employeeId,
               companyId
             ),
           },

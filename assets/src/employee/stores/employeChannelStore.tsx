@@ -31,17 +31,17 @@ interface IEmployeeChannelStore {
 
 export const EmployeeChannelStoreProvider = ({
   children,
-  userId,
+  employeeId,
 }: {
   children: React.ReactNode;
-  userId: string;
+  employeeId: string;
 }) => {
   const [store] = useState(() =>
     createStore(
       immer<IEmployeeChannelStore>((set) => {
         const state: IEmployeeChannelStore = {
           data: {
-            employeeChannel: new EmployeeChannel(userId),
+            employeeChannel: new EmployeeChannel(employeeId),
           },
           actions: {
             attachedStoreEvents: (

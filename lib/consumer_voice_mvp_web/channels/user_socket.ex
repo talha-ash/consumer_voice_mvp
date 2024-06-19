@@ -20,6 +20,7 @@ defmodule ConsumerVoiceMvpWeb.UserSocket do
   channel "#{@employee_company_topic}*", ConsumerVoiceMvpWeb.EmployeeCompanyChannel
   channel "client:*", ConsumerVoiceMvpWeb.ClientChannel
   channel "employee:*", ConsumerVoiceMvpWeb.EmployeeChannel
+  channel "call:*", ConsumerVoiceMvpWeb.CallChannel
 
   #
   # To create a channel file, use the mix task:

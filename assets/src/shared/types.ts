@@ -12,9 +12,6 @@ export type IUser = {
   email: string;
   status: onlineStatusType;
   confirmed_at: string | null;
-  companyId: string | null;
-  isEmployee: boolean;
-  company: ICompany | null;
   inserted_at: string;
   updated_at: string;
 };

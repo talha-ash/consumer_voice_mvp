@@ -1,16 +1,16 @@
-import { useClientChannelStore } from "@/client/stores/clientChannelStore";
-import { useClientStore } from "@/client/stores/clientStore";
-import { callStateType } from "@/client/types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Peer from "simple-peer";
+import { useClientChannelStore } from "@/client/stores/clientChannelStore";
+import { activeCallStateType } from "@/client/types";
 const constraints: MediaStreamConstraints = {
   video: false,
   audio: true,
 };
 
-export const useCallActive = (callState: callStateType) => {
+export const useCallActive = (activeCallState: activeCallStateType) => {
   const streamRef = useRef<MediaStream | null>(null);
   const peer2 = useRef<Peer.Instance | null>(null);
+  const eeeRef = useRef(0);
   const audioEle = useRef<HTMLAudioElement | null>(null);
 
   const sendClientConnectionData = useClientChannelStore(
@@ -48,7 +48,8 @@ export const useCallActive = (callState: callStateType) => {
     }
   };
   useEffect(() => {
-    if (callState.callActive) {
+    if (eeeRef.current == 0) {
+      eeeRef.current = 1;
       console.log("How many time i run", performance.now());
       try {
         navigator.mediaDevices
@@ -58,11 +59,11 @@ export const useCallActive = (callState: callStateType) => {
             streamRef.current = stream;
             let peer = new Peer({ stream });
             peer2.current = peer;
-            peer.signal(callState.employeeConnectionData);
+            peer.signal(activeCallState.employeeConnectionData);
             peer.on("signal", (data) => {
               sendClientConnectionData({
-                company_id: callState.companyId,
-                employee_id: callState.employeeId,
+                company_id: activeCallState.companyId,
+                employee_id: activeCallState.employeeId,
                 connection_data: data,
               });
             });
@@ -82,12 +83,6 @@ export const useCallActive = (callState: callStateType) => {
         console.log(err);
       }
     }
-    return () => {
-      if (callState.callActive) {
-        dismissAll();
-      }
-    };
-  }, [callState.callActive]);
+  }, []);
   return { dismissAll };
 };
-// async function to handle offer sd

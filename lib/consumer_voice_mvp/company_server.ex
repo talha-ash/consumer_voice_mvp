@@ -33,6 +33,10 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     GenServer.cast(pid, {:on_employee_online, employee})
   end
 
+  def employee_accept_call(pid, params) do
+    GenServer.cast(pid, {@employee_accept_call_decoded, params})
+  end
+
   @impl true
   def init(company) do
     Process.flag(:trap_exit, true)
@@ -96,8 +100,8 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   @impl true
   def handle_cast({@client_call_initiate_decoded, client}, state) do
     case CompanyServerData.on_client_call_initiate(client.id, state.company.id) do
-      {:ok, online_employee} ->
-        broadcast_employee_for_call(online_employee.employee_id, client)
+      {:ok, employee} ->
+        broadcast_employee_for_call(employee.id, client)
         {:noreply, state}
 
       {:error, reason} ->
@@ -108,11 +112,22 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({@employee_accept_call_decoded, params}, state) do
-    {employee_id, _client_id, _employee_connection_data} = params
+    {employee_id, client_id, employee_connection_data} = params
 
-    {:ok, _call} = CompanyServerData.employee_accept_call(employee_id, state.company.id)
+    {:ok, call} =
+      CompanyServerData.employee_accept_call(
+        employee_id: employee_id,
+        client_id: client_id,
+        company_id: state.company.id
+      )
 
-    broadcast_on_call_active(params)
+    broadcast_on_call_active(%{
+      employee_id: employee_id,
+      client_id: client_id,
+      employee_connection_data: employee_connection_data,
+      session_id: call.session_id
+    })
+
     {:noreply, state}
   end
 
@@ -205,17 +220,28 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     )
   end
 
-  defp broadcast_on_call_active({employee_id, client_id, employee_connection_data}) do
+  defp broadcast_on_call_active(params) do
+    %{
+      employee_id: employee_id,
+      client_id: client_id,
+      employee_connection_data: employee_connection_data,
+      session_id: session_id
+    } = params
+
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(
       "#{@employee_topic}#{employee_id}",
       @br_en_on_call_active,
-      %{client_id: client_id}
+      %{client_id: client_id, session_id: session_id}
     )
 
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(
       "#{@client_topic}#{client_id}",
       @br_en_on_call_active,
-      %{employee_id: employee_id, employee_connection_data: employee_connection_data}
+      %{
+        employee_id: employee_id,
+        employee_connection_data: employee_connection_data,
+        session_id: session_id
+      }
     )
   end
 end

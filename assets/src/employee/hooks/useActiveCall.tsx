@@ -32,7 +32,7 @@ export const useActiveCall = () => {
     });
   };
 
-  const dismissAll = () => {
+  const dismissAll = () => {    
     if (audioEle.current) {
       audioEle.current.remove();
       audioEle.current.pause();

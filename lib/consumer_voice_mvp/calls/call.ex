@@ -14,6 +14,7 @@ defmodule ConsumerVoiceMvp.Calls.Call do
   schema "calls" do
     field :status, Ecto.Enum, values: @status_values
     field :deleted_at, :utc_datetime
+    field :session_id, :string
 
     belongs_to :employee, Accounts.User, foreign_key: :employee_id
     belongs_to :client, Accounts.User, foreign_key: :client_id
@@ -22,10 +23,11 @@ defmodule ConsumerVoiceMvp.Calls.Call do
     timestamps(type: :utc_datetime)
   end
 
-  @creation_fields ~w(employee_id client_id company_id)a
+  @creation_fields ~w(employee_id client_id company_id session_id)a
 
   def creation_changeset(call, attrs) do
     IO.inspect(attrs, label: "Creating Call")
+
     call
     |> cast(attrs, @creation_fields)
     |> validate_required(@creation_fields)

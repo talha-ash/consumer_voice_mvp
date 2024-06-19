@@ -6,9 +6,10 @@ import { useCreateClientCompanyChannel } from "../hooks";
 import { CallModal } from "./CallModal";
 import { useClientStore } from "@/client/stores/clientStore";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
 
 export const CompanyDetail = () => {
-  const navigation = useLocation()[1]
+  const navigation = useLocation()[1];
   useCreateClientCompanyChannel();
   const clientCompanyState = useClientCompanyStore(
     (state) => state.data.clientCompanyState
@@ -28,7 +29,7 @@ export const CompanyDetail = () => {
 
   return (
     <div>
-      <button onClick={()=> navigation("/")}>Back</button>
+      <button onClick={() => navigation("/")}>Back</button>
       <h1>Company Info</h1>
       <div className="flex flex-row items-center gap-4">
         {/* <h1>Name: {clientCompanyState.company.name}</h1> */}

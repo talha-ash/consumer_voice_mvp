@@ -12,10 +12,10 @@ const EmployeeApp = () => {
   }
 
   return (
-    <EmployeeChannelStoreProvider userId={employee.id}>
+    <EmployeeChannelStoreProvider employeeId={employee.id}>
       <EmployeeCompanyChannelStoreProvider
-        userId={employee.id}
-        companyId={employee.companyId!}
+        employeeId={employee.id}
+        companyId={employee.companyId}
       >
         <Home />
       </EmployeeCompanyChannelStoreProvider>

@@ -44,12 +44,7 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
         <.input field={@form[:role]} type="select" label="Role" options={@options} />
 
         <%= if @is_employee do %>
-          <.input
-            field={@form[:company_id]}
-            type="select"
-            label="Company (If Your are Employee)"
-            options={@companies}
-          />
+          <.input field={@form[:company_id]} type="select" label="Company (If Your are Employee)" options={@companies} />
         <% end %>
 
         <:actions>
@@ -80,7 +75,7 @@ defmodule ConsumerVoiceMvpWeb.UserRegistrationLive do
   def handle_event("save", %{"user" => user_params}, socket) do
     # @todo "Handle company_id for employee registration"
     with {:ok, user} <- Accounts.register_user(user_params),
-         {:ok, _} <- Accounts.add_online_employee(user) do
+         {:ok, _} <- Accounts.add_employee(user) do
       {:ok, _} =
         Accounts.deliver_user_confirmation_instructions(
           user,

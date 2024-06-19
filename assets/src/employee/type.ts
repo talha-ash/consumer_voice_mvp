@@ -1,4 +1,10 @@
-import { IUser, companyStatusType } from "@/shared/types";
+import {
+  ICompany,
+  IUser,
+  companyStatusType,
+  onlineStatusType,
+  roleType,
+} from "@/shared/types";
 import Peer from "simple-peer";
 import {
   EMPLOYEE_STATUS_BUSY,
@@ -24,4 +30,18 @@ export type callStateType = {
   callModal: boolean;
   clientConnectionData: Peer.SignalData | null;
   employeeConnectionData: Peer.SignalData | null;
+};
+
+export type IEmployee = {
+  id: string;
+  role: roleType;
+  email: string;
+  status: onlineStatusType;
+  confirmed_at: string | null;
+  companyId: string;
+  employeeId: string;
+  isEmployee: boolean;
+  // company: ICompany;
+  inserted_at: string;
+  updated_at: string;
 };

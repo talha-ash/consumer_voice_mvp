@@ -52,14 +52,14 @@ defmodule ConsumerVoiceMvpWeb.ClientCompanyChannel do
   end
 
   @impl true
-  def terminate(reason, socket) do
-    client = socket.assigns.client
-    server_pid = socket.assigns.server_pid
+  def terminate(reason, _socket) do
+    # client = socket.assigns.client
+    # server_pid = socket.assigns.server_pid
 
-    GenServer.cast(
-      server_pid,
-      {:on_client_offline, client.id}
-    )
+    # GenServer.cast(
+    #   server_pid,
+    #   {:on_client_offline, client.id}
+    # )
 
     IO.inspect("Client Goes Dequeue", label: "reason")
     IO.inspect(reason)

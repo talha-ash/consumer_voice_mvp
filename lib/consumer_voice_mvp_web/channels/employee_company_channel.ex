@@ -18,9 +18,9 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
 
   @impl true
   def join(@employee_company_topic <> company_id, params, socket) do
+    IO.inspect(company_id, label: "company_id")
     employee_id = params["employeeId"]
     company_id = Helpers.string_to_integer(company_id)
-
     send(self(), {:after_join, employee_id, company_id})
     {:ok, server_pid} = CompanyRegistry.company_pid_lookup(company_id)
 
@@ -58,9 +58,9 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
     %{"client_id" => client_id, "employee_connection_data" => employee_connection_data} = payload
     %{server_pid: server_pid, employee_id: employee_id} = socket.assigns
 
-    GenServer.cast(
+    CompanyServer.employee_accept_call(
       server_pid,
-      {@employee_accept_call_decoded, {employee_id, client_id, employee_connection_data}}
+      {employee_id, client_id, employee_connection_data}
     )
 
     Presence.update(socket, employee_id, fn current ->

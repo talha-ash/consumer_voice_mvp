@@ -1,4 +1,4 @@
-defmodule ConsumerVoiceMvp.Companies.Online_Employee do
+defmodule ConsumerVoiceMvp.Companies.Employee do
   use Ecto.Schema
   import Ecto.Changeset
   alias ConsumerVoiceMvp.Const
@@ -11,22 +11,21 @@ defmodule ConsumerVoiceMvp.Companies.Online_Employee do
     Const.encode(:employee_status_offline)
   ]
 
-  schema "online_employees" do
+  schema "employees" do
     field :status, Ecto.Enum, values: @status_values
-    field :employee_id, :integer
 
-    belongs_to :users, Accounts.User, foreign_key: :employee_id, define_field: false
+    belongs_to :users, Accounts.User, foreign_key: :user_id
     belongs_to :companies, Company, foreign_key: :company_id
     timestamps(type: :utc_datetime)
   end
 
-  @create_fields ~w(employee_id company_id)a
+  @create_fields ~w(user_id company_id)a
 
   def creation_changeset(online_employee, attrs) do
     online_employee
     |> cast(attrs, @create_fields)
     |> validate_required(@create_fields)
-    |> unique_constraint(:employee_id)
+    |> unique_constraint(:user_id)
   end
 
   def update_changeset(online_employee, attrs) do

@@ -6,11 +6,19 @@ export type clientCompanyState = {
   company: ICompany;
 };
 
-export type callStateType = {
+export type initializingCallStateType = {
   callModal: boolean;
   callInitiateLoading: boolean;
   callActive: boolean;
   employeeId: string;
   companyId: string;
   employeeConnectionData: any;
+};
+
+export type activeCallStateType = {
+  callActive: boolean;
+  employeeId: string;
+  companyId: string;
+  employeeConnectionData: any;
+  sessionId: string;
 };

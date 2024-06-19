@@ -9,9 +9,7 @@ import {
   EN_COMPANY_STATE_UPDATE,
 } from "../constants";
 import { companyStateType } from "../type";
-interface ChannelActions {
-  onCompanyStateUpdate: (companyState: companyStateType) => void;
-}
+
 
 export class EmployeeCompanyChannel {
   channel: Channel;

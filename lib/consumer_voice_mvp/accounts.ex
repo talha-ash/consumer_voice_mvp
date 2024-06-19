@@ -7,7 +7,7 @@ defmodule ConsumerVoiceMvp.Accounts do
   alias ConsumerVoiceMvp.Helpers
   alias ConsumerVoiceMvp.{Repo, Companies}
 
-  alias ConsumerVoiceMvp.Accounts.{User, UserToken, UserNotifier, Company}
+  alias ConsumerVoiceMvp.Accounts.{User, UserToken, UserNotifier}
 
   ## Database getters
 
@@ -370,26 +370,26 @@ defmodule ConsumerVoiceMvp.Accounts do
   end
 
   @doc """
-  Craete Online Employee Data on employee registration
+  Create Employee Data on employee registration
 
   ## Examples
 
-      iex> add_online_employee(user)
+      iex> add_employee(user)
       {:ok, %OnlineEmployee{}}
 
-      iex> add_online_employee(user)
+      iex> add_employee(user)
       {:error, %Ecto.Changeset{}}
 
   """
 
-  def add_online_employee(%{company_id: company_id} = user) when is_number(company_id) do
+  def add_employee(%{company_id: company_id} = user) when is_number(company_id) do
     Companies.create_employee(%{
-      employee_id: user.id,
+      user_id: user.id,
       company_id: user.company_id
     })
   end
 
-  def add_online_employee(user) do
+  def add_employee(user) do
     {:ok, user}
   end
 end

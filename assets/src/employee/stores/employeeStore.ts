@@ -1,13 +1,11 @@
+import Peer from "simple-peer";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import {
-  EmployeeChannel,
-  EmployeeChannelEmitter,
-} from "../channels/employeeChannel";
 import { ROLE_EMPLOYEE } from "../../shared/constants";
 import { IUser, onlineStatusType } from "../../shared/types";
 import { getUserData } from "../../shared/utils";
-import Peer from "simple-peer";
+import { EmployeeChannelEmitter } from "../channels/employeeChannel";
+import { IEmployee } from "../type";
 
 interface IEmployeeStore {
   actions: {
@@ -22,7 +20,7 @@ interface IEmployeeStore {
     employeeStoreObserver: (emitter: EmployeeChannelEmitter) => void;
   };
   data: {
-    employee: IUser;
+    employee: IEmployee;
     callState: {
       callInitiateLoading: boolean;
       callActive: boolean;
@@ -33,15 +31,14 @@ interface IEmployeeStore {
     };
   };
 }
-const initialUser = getUserData();
+const initialEmployeeData = getUserData();
 
 export const useEmployeeStore = create(
   immer<IEmployeeStore>((set) => ({
     data: {
       employee: {
-        ...initialUser,
-        companyId: initialUser.company_id,
-        isEmployee: initialUser.role === ROLE_EMPLOYEE,
+        ...initialEmployeeData,
+        isEmployee: initialEmployeeData.role === ROLE_EMPLOYEE,
       },
       callState: {
         callModal: false,
@@ -73,10 +70,6 @@ export const useEmployeeStore = create(
           if (state.data.callState.callClient) {
             state.data.callState.employeeConnectionData =
               employeeConnectionData;
-            // state.data.employeeChannel.onAcceptCall(
-            //   state.data.callState.callClient.id,
-            //   state.data.callState.employeeConnectionData
-            // );
           }
         }),
       onCallActive: () =>
@@ -86,9 +79,6 @@ export const useEmployeeStore = create(
         }),
       dropCall: () =>
         set((state) => {
-          // state.data.employeeChannel.dropCall(
-          //   state.data.callState.callClient!.id
-          // );
           state.data.callState.callActive = false;
           state.data.callState.callInitiateLoading = false;
           state.data.callState.callClient = null;
@@ -109,7 +99,7 @@ export const useEmployeeStore = create(
       employeeStoreObserver: (emitter: EmployeeChannelEmitter) =>
         set((state) => {
           const onEmployeeDropCall = state.actions.onEmployeeDropCall;
-          emitter.on("br_en_call_drop", () => {
+          emitter.on("br_en_call_drop", () => {            
             onEmployeeDropCall();
           });
           const onCallActive = state.actions.onCallActive;
@@ -128,19 +118,3 @@ export const useEmployeeStore = create(
     },
   }))
 );
-
-// useEmployeeStore.setState((state) => {
-//   return {
-//     ...state,
-//     data: {
-//       ...state.data,
-//       employeeChannel: new EmployeeChannel(initialUser.id, {
-//         setUserStatus: state.actions.setStatus,
-//         onClientCall: state.actions.onClientCall,
-//         onCallActive: state.actions.onCallActive,
-//         onEmployeeDropCall: state.actions.onEmployeeDropCall,
-//         onClientConnectionData: state.actions.onClientConnectionData,
-//       }),
-//     },
-//   };
-// });
