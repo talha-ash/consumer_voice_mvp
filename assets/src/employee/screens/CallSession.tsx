@@ -1,15 +1,13 @@
 import { Button } from "@/shared/components";
-import { useClientStore } from "../stores/clientStore";
-import { useCallSessionStore } from "../stores/CallSessionStore";
 import { useLocation } from "wouter";
+import { useCallSessionStore } from "../stores/callSessionStore";
 import { useEffect } from "react";
+import { useEmployeeStore } from "../stores/employeeStore";
 
-type CallSessionProps = {
-  sessionId: string;
-};
-export const CallSession = ({ sessionId }: CallSessionProps) => {
+export const CallSession = ({ sessionId }: { sessionId: string }) => {
   const navigate = useLocation()[1];
-  const clearInitializingCallState = useClientStore(
+
+  const clearInitializingCallState = useEmployeeStore(
     (state) => state.actions.clearInitializingCallState
   );
   const activeCallState = useCallSessionStore(
@@ -21,12 +19,9 @@ export const CallSession = ({ sessionId }: CallSessionProps) => {
   );
 
   const handleDropCall = () => {
-    sendDropCall(activeCallState.companyId, activeCallState.employeeId).then(
-      () => {
-        console.log("Why not navigating", activeCallState.companyId);
-        navigate(`/company/${activeCallState.companyId}`);
-      }
-    );
+    sendDropCall().then(() => {
+      navigate("/");
+    });
   };
 
   useEffect(() => {
@@ -35,10 +30,10 @@ export const CallSession = ({ sessionId }: CallSessionProps) => {
 
   return (
     <div>
-      <h1>Call Session {sessionId}</h1>
-      <div>
+      Call Session {sessionId}
+      {activeCallState.callActive ? (
         <Button text={"Drop Call"} onClick={handleDropCall} />
-      </div>
+      ) : null}
     </div>
   );
 };

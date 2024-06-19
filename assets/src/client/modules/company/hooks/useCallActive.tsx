@@ -47,42 +47,43 @@ export const useCallActive = (activeCallState: activeCallStateType) => {
       console.log("Stream Dismisal");
     }
   };
-  useEffect(() => {
-    if (eeeRef.current == 0) {
-      eeeRef.current = 1;
-      console.log("How many time i run", performance.now());
-      try {
-        navigator.mediaDevices
-          .getUserMedia(constraints)
-          .then((stream) => {
-            // Handle the media stream as needed.
-            streamRef.current = stream;
-            let peer = new Peer({ stream });
-            peer2.current = peer;
-            peer.signal(activeCallState.employeeConnectionData);
-            peer.on("signal", (data) => {
-              sendClientConnectionData({
-                company_id: activeCallState.companyId,
-                employee_id: activeCallState.employeeId,
-                connection_data: data,
-              });
-            });
-            peer.on("stream", (stream) => {
-              // got remote video stream, now let's show it in a video tag
-              const audio = document.createElement("audio");
-              audioEle.current = audio;
-              audio.srcObject = stream;
-              audio.play();
-            });
-          })
-          .catch((error) => {
-            console.error("Error accessing media devices.", error);
-            // Handle the error if constraints cannot be satisfied.
-          });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, []);
+
+  // useEffect(() => {
+  //   if (eeeRef.current == 0) {
+  //     eeeRef.current = 1;
+  //     console.log("How many time i run", performance.now());
+  //     try {
+  //       navigator.mediaDevices
+  //         .getUserMedia(constraints)
+  //         .then((stream) => {
+  //           // Handle the media stream as needed.
+  //           streamRef.current = stream;
+  //           let peer = new Peer({ stream });
+  //           peer2.current = peer;
+  //           peer.signal(activeCallState.employeeConnectionData);
+  //           peer.on("signal", (data) => {
+  //             sendClientConnectionData({
+  //               company_id: activeCallState.companyId,
+  //               employee_id: activeCallState.employeeId,
+  //               connection_data: data,
+  //             });
+  //           });
+  //           peer.on("stream", (stream) => {
+  //             // got remote video stream, now let's show it in a video tag
+  //             const audio = document.createElement("audio");
+  //             audioEle.current = audio;
+  //             audio.srcObject = stream;
+  //             audio.play();
+  //           });
+  //         })
+  //         .catch((error) => {
+  //           console.error("Error accessing media devices.", error);
+  //           // Handle the error if constraints cannot be satisfied.
+  //         });
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   }
+  // }, []);
   return { dismissAll };
 };

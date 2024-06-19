@@ -9,6 +9,7 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
 
   @call_status_waiting Const.encode(:call_status_waiting)
   @call_status_ended Const.encode(:call_status_ended)
+  @call_status_active Const.encode(:call_status_active)
 
   def on_employee_online(state, employee) do
     case Companies.update_employee_status(employee.id, state.company.id, @employee_status_idle) do
@@ -98,7 +99,8 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
              employee_id: employee_id,
              client_id: client_id,
              company_id: company_id,
-             session_id: session_id
+             session_id: session_id,
+             status: @call_status_active
            }) do
       {:ok, call}
     else

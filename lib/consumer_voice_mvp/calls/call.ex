@@ -23,10 +23,9 @@ defmodule ConsumerVoiceMvp.Calls.Call do
     timestamps(type: :utc_datetime)
   end
 
-  @creation_fields ~w(employee_id client_id company_id session_id)a
+  @creation_fields ~w(employee_id client_id company_id session_id status)a
 
   def creation_changeset(call, attrs) do
-    IO.inspect(attrs, label: "Creating Call")
 
     call
     |> cast(attrs, @creation_fields)
@@ -34,6 +33,7 @@ defmodule ConsumerVoiceMvp.Calls.Call do
     |> foreign_key_constraint(:employee_id)
     |> foreign_key_constraint(:client_id)
     |> foreign_key_constraint(:company_id)
+    |> validate_inclusion(:status, @status_values)
   end
 
   def update_changeset(call, attrs) do

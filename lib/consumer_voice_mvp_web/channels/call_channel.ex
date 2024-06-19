@@ -4,6 +4,10 @@ defmodule ConsumerVoiceMvpWeb.CallChannel do
 
   @client_drop_call Const.encode(:client_drop_call)
   @client_drop_call_decoded Const.decode("client_drop_call")
+  @client_connection_data Const.encode(:client_connection_data)
+  @employee_connection_data Const.encode(:employee_connection_data)
+  @br_en_client_connection_data Const.encode(:br_en_client_connection_data)
+  @br_en_employee_connection_data Const.encode(:br_en_employee_connection_data)
 
   @impl true
   def join("call:" <> session_id, _params, socket) do
@@ -31,6 +35,18 @@ defmodule ConsumerVoiceMvpWeb.CallChannel do
       {@client_drop_call_decoded, {employee_id, client_id}}
     )
 
+    {:noreply, socket}
+  end
+
+  @imple true
+  def handle_in(@client_connection_data, payload, socket) do
+    broadcast(socket, @br_en_employee_connection_data, payload)
+    {:noreply, socket}
+  end
+
+  @imple true
+  def handle_in(@employee_connection_data, payload, socket) do
+    broadcast(socket, @br_en_client_connection_data, payload)
     {:noreply, socket}
   end
 end

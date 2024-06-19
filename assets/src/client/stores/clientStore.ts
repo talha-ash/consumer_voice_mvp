@@ -15,8 +15,7 @@ interface IClientStore {
   actions: {
     setStatus: (status: onlineStatusType) => void;
     onCallActive: (message: {
-      employee_id: string;
-      employee_connection_data: Peer.SignalData;
+      employee_id: string;      
       session_id: string;
     }) => void;
     toggleCallModal: (loading?: boolean) => void;
@@ -80,9 +79,7 @@ export const useClientStore = create(
         set((state) => {
           state.data.initializingCallState.callActive = true;
           state.data.initializingCallState.callInitiateLoading = false;
-          state.data.initializingCallState.employeeId = message.employee_id;
-          state.data.initializingCallState.employeeConnectionData =
-            message.employee_connection_data;
+          state.data.initializingCallState.employeeId = message.employee_id;          
           state.data.initializingCallState.sessionId = message.session_id;
         }),
       onInitiateCall: (companyId) =>

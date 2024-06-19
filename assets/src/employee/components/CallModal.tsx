@@ -1,59 +1,42 @@
 import { Button, Modal } from "@/shared/components";
 import { useEmployeeStore } from "../stores/employeeStore";
-import { useEffect, useRef } from "react";
-
-import { useActiveCall } from "../hooks";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+import { useEmployeeCompanyChannelStore } from "../stores/employeCompanyChannelStore";
 
 export const CallModal = () => {
-  const callState = useEmployeeStore((state) => state.data.callState);
-  const { dismissAll, initCall, handleAcceptCall, handleDropCall } =
-    useActiveCall();
-  const flagRef = useRef(false);
+  const navigate = useLocation()[1];
+  const sendAcceptCall = useEmployeeCompanyChannelStore(
+    (state) => state.actions.sendAcceptCall
+  );
+  const initializingCallState = useEmployeeStore(
+    (state) => state.data.initializingCallState
+  );
 
   const toggleCallModal = useEmployeeStore(
     (state) => state.actions.toggleCallModal
   );
 
   useEffect(() => {
-    //@Todo May be we dont need this its already true
-    if (callState.callActive) {
-      toggleCallModal(true);
+    if (initializingCallState.callActive) {
+      navigate(`/call/${initializingCallState.sessionId}`);
     }
-    return () => {
-      if (callState.callActive) {
-        dismissAll();
-      }
-    };
-  }, [callState.callActive]);
+  }, [initializingCallState.callActive]);
 
-  useEffect(() => {
-    if (callState.clientConnectionData) {
-      flagRef.current = true;
-      initCall(callState.clientConnectionData);
-    }
-  }, [callState.clientConnectionData]);
-
-  const setVisible = (visible: boolean) => {
-    toggleCallModal(visible);
-    if (!visible) {
-      handleDropCall();
-    }
+  const handleAcceptCall = () => {
+    sendAcceptCall(initializingCallState);
   };
 
   return (
     <Modal
-      visible={callState.callModal}
-      setVisible={setVisible}
+      visible={initializingCallState.callModal}
+      setVisible={toggleCallModal}
       title="Initiating Call"
       disableOutsideClick
     >
-      <h1>Client ID{callState.callClient?.id}</h1>
-      {callState.callInitiateLoading ? (
+      <h1>Client ID{initializingCallState.callClient?.id}</h1>
+      {initializingCallState.callInitiateLoading ? (
         <Button text={"Accept Call"} onClick={handleAcceptCall} />
-      ) : null}
-
-      {callState.callActive ? (
-        <Button text={"Drop Call"} onClick={handleDropCall} />
       ) : null}
     </Modal>
   );

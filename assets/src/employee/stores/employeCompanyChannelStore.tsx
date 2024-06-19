@@ -6,7 +6,7 @@ import {
   EmployeeCompanyChannel,
   EmployeeCompanyChannelAttachedEvent,
 } from "../channels/employeeCompanyChannel";
-import Peer from "simple-peer";
+
 import { callStateType } from "../type";
 const EmployeeCompanyChannelStoreContext =
   createContext<StoreApi<IEmployeeCompanyChannelStore> | null>(null);
@@ -18,10 +18,7 @@ type clientCompanyStoreType = {
 interface IEmployeeCompanyChannelStore {
   data: clientCompanyStoreType;
   actions: {
-    sendAcceptCall: (
-      callState: callStateType,
-      employeeConnectionData: Peer.SignalData
-    ) => void;
+    sendAcceptCall: (callState: callStateType) => void;
     sendDropCall: (employeeId: string) => void;
     // sendClientConnectionData: (payload: {
     //   connection_data: Peer.SignalData;
@@ -77,15 +74,11 @@ export const EmployeeCompanyChannelStoreProvider = ({
               set((state) => {
                 state.data.employeeCompanyChannel.sendDropCall(clientId);
               }),
-            sendAcceptCall: (
-              callState: callStateType,
-              employeeConnectionData: Peer.SignalData
-            ) =>
+            sendAcceptCall: (callState: callStateType) =>
               set((state) => {
                 if (callState.callClient) {
                   state.data.employeeCompanyChannel.sendAcceptCall(
-                    callState.callClient.id,
-                    employeeConnectionData
+                    callState.callClient.id
                   );
                 }
               }),

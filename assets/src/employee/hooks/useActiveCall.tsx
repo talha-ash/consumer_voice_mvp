@@ -2,13 +2,14 @@ import { useRef } from "react";
 import Peer, { SignalData } from "simple-peer";
 import { useEmployeeStore } from "../stores/employeeStore";
 import { useEmployeeCompanyChannelStore } from "../stores/employeCompanyChannelStore";
+import { useCallSessionStore } from "../stores/callSessionStore";
 
 export const useActiveCall = () => {
-  const { employee, callState } = useEmployeeStore((state) => state.data);
-  const onAcceptCall = useEmployeeStore((state) => state.actions.onAcceptCall);
-  const sendAcceptCall = useEmployeeCompanyChannelStore(
-    (state) => state.actions.sendAcceptCall
+  const activeCallState = useCallSessionStore(
+    (state) => state.data.activeCallState
   );
+  const onAcceptCall = useEmployeeStore((state) => state.actions.onAcceptCall);
+
   const dropCall = useEmployeeStore((state) => state.actions.dropCall);
   const sendDropCall = useEmployeeCompanyChannelStore(
     (state) => state.actions.sendDropCall
@@ -32,7 +33,7 @@ export const useActiveCall = () => {
     });
   };
 
-  const dismissAll = () => {    
+  const dismissAll = () => {
     if (audioEle.current) {
       audioEle.current.remove();
       audioEle.current.pause();
@@ -78,7 +79,6 @@ export const useActiveCall = () => {
             if (flag) {
               flag = false;
               onAcceptCall(data);
-              sendAcceptCall(callState, data);
             }
           });
         })
@@ -94,7 +94,7 @@ export const useActiveCall = () => {
   const handleDropCall = () => {
     dismissAll();
     dropCall();
-    sendDropCall(callState.callClient?.id!);
+    sendDropCall(activeCallState.callClient?.id!);
   };
 
   return { dismissAll, initCall, handleAcceptCall, handleDropCall };

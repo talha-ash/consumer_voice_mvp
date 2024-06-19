@@ -14,3 +14,6 @@ export const BR_EN_ON_CALL_ACTIVE = "br_en_on_call_active";
 export const BR_EN_CALL_DROP = "br_en_call_drop";
 export const BR_CLIENT_CONNECTION_DATA = "br_client_connection_data";
 export const CLIENT_CONNECTION_DATA = "client_connection_data";
+export const EMPLOYEE_CONNECTION_DATA = "employee_connection_data";
+export const BR_EN_EMPLOYEE_CONNECTION_DATA = "br_en_employee_connection_data";
+export const BR_EN_CLIENT_CONNECTION_DATA = "br_en_client_connection_data";

@@ -1,8 +1,10 @@
+import { IUser } from "@/shared/types";
 import React, { createContext, useState } from "react";
 import Peer from "simple-peer";
 import { StoreApi, createStore, useStore } from "zustand";
+
 import { CallSessionChannel } from "../channels";
-import { useClientStore } from "./clientStore";
+import { useEmployeeStore } from "./employeeStore";
 
 const constraints: MediaStreamConstraints = {
   video: false,
@@ -16,12 +18,12 @@ type CallSessionStoreType = {
   callSessionChannel: CallSessionChannel;
   activeCallState: {
     callActive: boolean;
-    employeeId: string;
-    companyId: string;
+    callClient: IUser | null;
+    clientConnectionData: Peer.SignalData | null;
     employeeConnectionData: Peer.SignalData | null;
-    sessionId: string;
+    sessionId: string | null;
     stream: MediaStream | null;
-    peer2: Peer.Instance | null;
+    peer1: Peer.Instance | null;
     audioEle: any;
   };
 };
@@ -31,14 +33,10 @@ export interface ICallSessionStore {
   actions: {
     initCall: () => void;
     dismissAll: () => void;
-    sendDropCall: (companyId: string, employeeId: string) => Promise<void>;
-    sendClientConnectionData: (payload: {
-      connection_data: Peer.SignalData;
-      employee_id: string;
-      company_id: string;
-    }) => void;
-    onEmployeeConnectionData: (connectionData: Peer.SignalData) => void;
+    sendDropCall: () => Promise<void>;
+    onClientConnectionData: (connectionData: Peer.SignalData) => void;
     createCallSessionChannel: (sessionId: string) => void;
+    onPeerSignal: (data: Peer.SignalData) => void;
   };
 }
 
@@ -52,18 +50,19 @@ export const CallSessionStoreProvider = ({
   const [store] = useState(() =>
     createStore<ICallSessionStore>((set) => {
       const initializingCallState =
-        useClientStore.getState().data.initializingCallState;
+        useEmployeeStore.getState().data.initializingCallState;
       const state: ICallSessionStore = {
         data: {
           callSessionChannel: {} as CallSessionChannel,
           activeCallState: {
             callActive: true,
-            employeeId: initializingCallState.employeeId,
-            companyId: initializingCallState.companyId,
-            employeeConnectionData: null,
-            sessionId: initializingCallState.sessionId,
+            callClient: initializingCallState.callClient,
+            clientConnectionData: initializingCallState.clientConnectionData,
+            employeeConnectionData:
+              initializingCallState.employeeConnectionData,
+            sessionId: initializingCallState.sessionId!,
             stream: null,
-            peer2: null,
+            peer1: null,
             audioEle: null,
           },
         },
@@ -74,104 +73,93 @@ export const CallSessionStoreProvider = ({
                 sessionId,
                 state.actions
               );
-              state = { ...state, data: { ...state.data } };
               return state;
             }),
-          sendDropCall: async (companyId: string, employeeId: string) =>
+          sendDropCall: async () =>
             set((state) => {
-              state.actions.dismissAll();
               state.data.activeCallState = {
                 callActive: false,
-                employeeId: "",
-                companyId: "",
+                callClient: null,
+                clientConnectionData: null,
                 employeeConnectionData: null,
-                sessionId: "",
+                sessionId: null,
                 stream: null,
-                peer2: null,
+                peer1: null,
                 audioEle: null,
               };
-              state.data.callSessionChannel.dropCall(companyId, employeeId);
+              state.data.callSessionChannel.dropCall();
+              return state;
+            }),
 
-              state = { ...state, data: { ...state.data } };
-              return state;
-            }),
-          sendClientConnectionData: (payload: {
-            connection_data: Peer.SignalData;
-            employee_id: string;
-            company_id: string;
-          }) =>
-            set((state) => {
-              state.data.callSessionChannel.sendClientConnectionData(payload);
-              return state;
-            }),
-          onEmployeeConnectionData: (connectionData: Peer.SignalData) =>
+          onClientConnectionData: (connectionData: Peer.SignalData) =>
             set((state) => {
               const activeCallState = state.data.activeCallState;
-              activeCallState.employeeConnectionData = connectionData;
-              activeCallState.peer2!.signal(connectionData);
-              activeCallState.peer2!.on("stream", (stream) => {
-                const audio: HTMLAudioElement = document.createElement("audio");
+              activeCallState.clientConnectionData = connectionData;
+              activeCallState.peer1?.signal(connectionData);
+              activeCallState.peer1?.on("stream", (stream) => {
+                if (document.querySelector("audio")) {
+                  document.querySelector("audio")?.remove();
+                }
+                const audio = document.createElement("audio");
                 activeCallState.audioEle = audio;
                 audio.srcObject = stream;
                 audio.play();
               });
-              state = { ...state, data: { ...state.data, activeCallState } };
+              state = {
+                ...state,
+                data: {
+                  ...state.data,
+                  activeCallState: activeCallState,
+                },
+              };
               return state;
             }),
-          initCall: () =>
+          onPeerSignal: (data) =>
             set((state) => {
-              const activeCallState = state.data.activeCallState;
-              try {
-                navigator.mediaDevices
-                  .getUserMedia(constraints)
-                  .then((stream) => {
-                    // Handle the media stream as needed.
-                    activeCallState.stream = stream;
-                    let peer = new Peer({ stream });
-                    activeCallState.peer2 = peer;
-                    peer.on("signal", (data) => {
-                      state.data.callSessionChannel.sendClientConnectionData({
-                        company_id: activeCallState.companyId,
-                        employee_id: activeCallState.employeeId,
-                        connection_data: data,
-                      });
-                    });
-                  })
-                  .catch((error) => {
-                    console.error("Error accessing media devices.", error);
-                    // Handle the error if constraints cannot be satisfied.
-                  });
-              } catch (err) {
-                console.log(err);
-              }
-              state = { ...state, data: { ...state.data, activeCallState } };
+              state.data.callSessionChannel.sendEmployeeConnectionData(data);
               return state;
             }),
+          initCall: async () => {
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia(
+                constraints
+              );
+              const peer = new Peer({ initiator: true, stream });
+
+              set((state) => {
+                const activeCallState = state.data.activeCallState;
+                activeCallState.peer1 = peer;
+                activeCallState.stream = stream;
+                peer.on("signal", state.actions.onPeerSignal);
+                state = { ...state, data: { ...state.data, activeCallState } };
+                return state;
+              });
+            } catch (error) {
+              console.log(error);
+            }
+          },
           dismissAll: () =>
             set((state) => {
               const activeCallState = state.data.activeCallState;
               if (activeCallState.audioEle) {
+                activeCallState.audioEle.remove();
                 activeCallState.audioEle.pause();
                 activeCallState.audioEle.srcObject = null;
-                activeCallState.audioEle.remove();
                 activeCallState.audioEle = null;
-                if (document.querySelector("audio")) {
-                  document.querySelector("audio")?.remove();
-                }
                 console.log("Audio Dismisal");
               }
-              if (activeCallState.stream) {
-                if (activeCallState.peer2) {
-                  // @Todo Need to handle when drop by employee
-                  if (!activeCallState.peer2.destroyed) {
-                    activeCallState.peer2.removeStream(activeCallState.stream);
-                  }
-                  activeCallState.peer2.removeAllListeners();
-                  activeCallState.peer2.destroy();
-                  activeCallState.peer2 = null;
-                  console.log("Peer2 Dismisal");
-                }
 
+              if (activeCallState.stream) {
+                if (activeCallState.peer1) {
+                  // @Todo Need to handle when drop by employee
+                  if (!activeCallState.peer1.destroyed) {
+                    activeCallState.peer1.removeStream(activeCallState.stream);
+                  }
+                  activeCallState.peer1.removeAllListeners();
+                  activeCallState.peer1.destroy();
+                  activeCallState.peer1 = null;
+                  console.log("Peer1 Dismisal");
+                }
                 activeCallState.stream.getTracks().forEach((track) => {
                   track.stop();
                 });
@@ -184,13 +172,13 @@ export const CallSessionStoreProvider = ({
                   ...state.data,
                   activeCallState: {
                     callActive: false,
-                    employeeId: "",
-                    companyId: "",
                     employeeConnectionData: null,
                     sessionId: "",
                     stream: null,
-                    peer2: null,
+                    peer1: null,
                     audioEle: null,
+                    callClient: null,
+                    clientConnectionData: null,
                   },
                 },
               };

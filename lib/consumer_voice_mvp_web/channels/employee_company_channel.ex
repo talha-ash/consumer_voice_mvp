@@ -55,12 +55,12 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
 
   @impl true
   def handle_in(@employee_accept_call, payload, socket) do
-    %{"client_id" => client_id, "employee_connection_data" => employee_connection_data} = payload
+    %{"client_id" => client_id} = payload
     %{server_pid: server_pid, employee_id: employee_id} = socket.assigns
 
     CompanyServer.employee_accept_call(
       server_pid,
-      {employee_id, client_id, employee_connection_data}
+      {employee_id, client_id}
     )
 
     Presence.update(socket, employee_id, fn current ->

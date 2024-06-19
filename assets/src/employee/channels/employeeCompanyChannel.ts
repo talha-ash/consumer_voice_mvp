@@ -10,7 +10,6 @@ import {
 } from "../constants";
 import { companyStateType } from "../type";
 
-
 export class EmployeeCompanyChannel {
   channel: Channel;
   emitter: EmployeeCompanyChannelEmitter = mitt();
@@ -46,15 +45,14 @@ export class EmployeeCompanyChannel {
     });
   }
 
-  sendAcceptCall(clientId: string, employeeConnectionData: Peer.SignalData) {
+  sendAcceptCall(clientId: string) {
     this.channel.push(EMPLOYEE_ACCEPT_CALL, {
       client_id: clientId,
-      employee_connection_data: employeeConnectionData,
     });
   }
 
   sendDropCall(clientId: string) {
-  console.log("sendDropCall", clientId);
+    console.log("sendDropCall", clientId);
     this.channel.push(EMPLOYEE_DROP_CALL, { client_id: clientId });
   }
 

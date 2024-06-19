@@ -112,7 +112,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({@employee_accept_call_decoded, params}, state) do
-    {employee_id, client_id, employee_connection_data} = params
+    {employee_id, client_id} = params
 
     {:ok, call} =
       CompanyServerData.employee_accept_call(
@@ -124,7 +124,6 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     broadcast_on_call_active(%{
       employee_id: employee_id,
       client_id: client_id,
-      employee_connection_data: employee_connection_data,
       session_id: call.session_id
     })
 
@@ -224,7 +223,6 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     %{
       employee_id: employee_id,
       client_id: client_id,
-      employee_connection_data: employee_connection_data,
       session_id: session_id
     } = params
 
@@ -239,7 +237,6 @@ defmodule ConsumerVoiceMvp.CompanyServer do
       @br_en_on_call_active,
       %{
         employee_id: employee_id,
-        employee_connection_data: employee_connection_data,
         session_id: session_id
       }
     )
