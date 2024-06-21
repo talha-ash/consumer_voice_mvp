@@ -132,12 +132,11 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
   @impl true
   def handle_cast({@employee_drop_call_decoded, params}, state) do
-    {employee_id, client_id} = params
+    {employee_id} = params
 
     case CompanyServerData.on_drop_call({:employee, employee_id, state.company.id}) do
       {:ok, _call} ->
-        IO.inspect(client_id, label: "Client ID")
-        broadcast_employee_call_drop(client_id)
+        # broadcast_employee_call_drop(client_id)
         {:noreply, state}
 
       {:error, message} ->
@@ -147,10 +146,10 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   end
 
   @impl true
-  def handle_cast({@client_drop_call_decoded, {_employee_id, client_id}}, state) do
-    {:ok, call} = CompanyServerData.on_drop_call({:client, client_id, state.company.id})
+  def handle_cast({@client_drop_call_decoded, {client_id}}, state) do
+    {:ok, _call} = CompanyServerData.on_drop_call({:client, client_id, state.company.id})
 
-    broadcast_client_call_drop(call.employee_id)
+    # broadcast_client_call_drop(call.employee_id)
     {:noreply, state}
   end
 
@@ -195,21 +194,21 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     )
   end
 
-  defp broadcast_employee_call_drop(client_id) do
-    ConsumerVoiceMvpWeb.Endpoint.broadcast!(
-      "#{@client_topic}#{client_id}",
-      @br_en_call_drop,
-      %{}
-    )
-  end
+  # defp broadcast_employee_call_drop(client_id) do
+  #   ConsumerVoiceMvpWeb.Endpoint.broadcast!(
+  #     "#{@client_topic}#{client_id}",
+  #     @br_en_call_drop,
+  #     %{}
+  #   )
+  # end
 
-  defp broadcast_client_call_drop(employee_id) do
-    ConsumerVoiceMvpWeb.Endpoint.broadcast!(
-      "#{@employee_topic}#{employee_id}",
-      @br_en_call_drop,
-      %{}
-    )
-  end
+  # defp broadcast_client_call_drop(employee_id) do
+  #   ConsumerVoiceMvpWeb.Endpoint.broadcast!(
+  #     "#{@employee_topic}#{employee_id}",
+  #     @br_en_call_drop,
+  #     %{}
+  #   )
+  # end
 
   defp broadcast_client_connection_data({connection_data, employee_id}) do
     ConsumerVoiceMvpWeb.Endpoint.broadcast!(

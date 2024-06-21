@@ -28,6 +28,12 @@ export const CallSession = ({ sessionId }: { sessionId: string }) => {
     clearInitializingCallState();
   }, []);
 
+  useEffect(() => {
+    if (!activeCallState.callActive) {
+      navigate("/");
+    }
+  }, [activeCallState.callActive]);
+
   return (
     <div>
       Call Session {sessionId}

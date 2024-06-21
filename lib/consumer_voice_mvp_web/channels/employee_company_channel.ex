@@ -1,20 +1,22 @@
 defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
+  alias Phoenix.PubSub
   alias ConsumerVoiceMvp.CompanyServer
   alias ConsumerVoiceMvp.{Helpers, Const, CompanyRegistry}
   alias ConsumerVoiceMvpWeb.Presence
 
   use Phoenix.Channel
 
+  intercept ["presence_diff"]
+
   @employee_company_topic Const.encode(:employee_company_topic)
 
   @employee_status_idle Const.encode(:employee_status_idle)
   @employee_status_busy Const.encode(:employee_status_busy)
+  @employee_status_offline Const.encode(:employee_status_offline)
 
   @employee_accept_call Const.encode(:employee_accept_call)
-  @employee_accept_call_decoded Const.decode("employee_accept_call")
 
-  @employee_drop_call Const.encode(:employee_drop_call)
-  @employee_drop_call_decoded Const.decode("employee_drop_call")
+  @client_company_topic Const.encode(:client_company_topic)
 
   @impl true
   def join(@employee_company_topic <> company_id, params, socket) do
@@ -47,9 +49,18 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
         status: @employee_status_idle
       })
 
-    Presence.track(self(), "#{@employee_company_topic}#{company_id}", employee.id, %{})
+    # Presence.track(self(), "#{@employee_company_topic}#{company_id}", employee.id, %{})
 
     push(socket, "presence_state", Presence.list(socket))
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:employee_drop_call, employee_id}, socket) do
+    Presence.update(socket, employee_id, fn current ->
+      Map.put(current, :status, @employee_status_idle)
+    end)
+
     {:noreply, socket}
   end
 
@@ -71,18 +82,18 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
   end
 
   @impl true
-  def handle_in(@employee_drop_call, %{"client_id" => client_id}, socket) do
-    %{server_pid: server_pid, employee_id: employee_id} = socket.assigns
+  def handle_out("presence_diff", presences, socket) do
+    company_id = socket.assigns.company_id
+    payload = %{joins: presences.joins}
+    IO.inspect(payload, label: "Presence Diff In Handle Out")
 
-    GenServer.cast(
-      server_pid,
-      {@employee_drop_call_decoded, {employee_id, client_id}}
+    PubSub.broadcast(
+      ConsumerVoiceMvp.PubSub,
+      "#{@client_company_topic}#{company_id}",
+      {:employee_precense_update, payload}
     )
 
-    Presence.update(socket, employee_id, fn current ->
-      Map.put(current, :status, @employee_status_idle)
-    end)
-
+    push(socket, "presence_diff", presences)
     {:noreply, socket}
   end
 
@@ -95,6 +106,18 @@ defmodule ConsumerVoiceMvpWeb.EmployeeCompanyChannel do
     GenServer.cast(
       pid,
       {:on_employee_offline, employee_id}
+    )
+
+    Presence.update(socket, employee_id, fn current ->
+      Map.put(current, :status, @employee_status_offline)
+    end)
+
+    presences = Presence.list(socket)
+
+    PubSub.broadcast(
+      ConsumerVoiceMvp.PubSub,
+      "#{@client_company_topic}#{company_id}",
+      {:employee_precense_update, %{joins: presences}}
     )
 
     IO.inspect("Employee Goes Offline", label: "reason")

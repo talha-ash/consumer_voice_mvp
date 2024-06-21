@@ -21,17 +21,20 @@ export const CallSession = ({ sessionId }: CallSessionProps) => {
   );
 
   const handleDropCall = () => {
-    sendDropCall(activeCallState.companyId, activeCallState.employeeId).then(
-      () => {
-        console.log("Why not navigating", activeCallState.companyId);
-        navigate(`/company/${activeCallState.companyId}`);
-      }
-    );
+    sendDropCall().then(() => {
+      navigate("/");
+    });
   };
 
   useEffect(() => {
     clearInitializingCallState();
   }, []);
+
+  useEffect(() => {
+    if (!activeCallState.callActive) {
+      navigate("/");
+    }
+  }, [activeCallState.callActive]);
 
   return (
     <div>

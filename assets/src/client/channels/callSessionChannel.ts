@@ -1,7 +1,7 @@
 import { Channel } from "phoenix";
 import Peer from "simple-peer";
 import {
-  BR_EN_CALL_DROP,
+  BR_EN_EMPLOYEE_CALL_DROP,
   BR_EN_EMPLOYEE_CONNECTION_DATA,
   BR_EN_ON_CALL_ACTIVE,
   CLIENT_CONNECTION_DATA,
@@ -27,25 +27,20 @@ export class CallSessionChannel {
       });
   }
 
-  dropCall(companyId: string, employeeId: string) {
-    this.channel.push(CLIENT_DROP_CALL, {
-      employee_id: employeeId || null,
-      company_id: companyId,
-    });
+  sendDropCall() {
+    this.channel.push(CLIENT_DROP_CALL, {});
   }
 
-  sendClientConnectionData(payload: {
-    connection_data: Peer.SignalData;
-    employee_id: string;
-    company_id: string;
-  }) {
+  sendClientConnectionData(payload: { connection_data: Peer.SignalData }) {
     this.channel.push(CLIENT_CONNECTION_DATA, payload);
   }
   handleEvents() {
     this.channel.on(BR_EN_ON_CALL_ACTIVE, (message) => {});
-    this.channel.on(BR_EN_CALL_DROP, () => {});
+    this.channel.on(BR_EN_EMPLOYEE_CALL_DROP, () => {
+      this.storeActions.onEmployeeCallDrop();
+    });
     this.channel.on(BR_EN_EMPLOYEE_CONNECTION_DATA, (message) => {
-      this.storeActions.onEmployeeConnectionData(message);
+      this.storeActions.onEmployeeConnectionData(message.connection_data);
     });
   }
 }

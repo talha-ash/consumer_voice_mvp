@@ -31,14 +31,16 @@ export interface ICallSessionStore {
   actions: {
     initCall: () => void;
     dismissAll: () => void;
-    sendDropCall: (companyId: string, employeeId: string) => Promise<void>;
+    sendDropCall: () => Promise<void>;
     sendClientConnectionData: (payload: {
       connection_data: Peer.SignalData;
       employee_id: string;
       company_id: string;
     }) => void;
+    onPeerSignal: (connectionData: Peer.SignalData) => void;
     onEmployeeConnectionData: (connectionData: Peer.SignalData) => void;
     createCallSessionChannel: (sessionId: string) => void;
+    onEmployeeCallDrop: () => void;
   };
 }
 
@@ -77,7 +79,23 @@ export const CallSessionStoreProvider = ({
               state = { ...state, data: { ...state.data } };
               return state;
             }),
-          sendDropCall: async (companyId: string, employeeId: string) =>
+          onEmployeeCallDrop: () =>
+            set((state) => {             
+              state.actions.dismissAll();
+              state.data.activeCallState = {
+                callActive: false,
+                employeeId: "",
+                companyId: "",
+                employeeConnectionData: null,
+                sessionId: "",
+                stream: null,
+                peer2: null,
+                audioEle: null,
+              };
+              state = { ...state, data: { ...state.data } };
+              return state;
+            }),
+          sendDropCall: async () =>
             set((state) => {
               state.actions.dismissAll();
               state.data.activeCallState = {
@@ -90,7 +108,7 @@ export const CallSessionStoreProvider = ({
                 peer2: null,
                 audioEle: null,
               };
-              state.data.callSessionChannel.dropCall(companyId, employeeId);
+              state.data.callSessionChannel.sendDropCall();
 
               state = { ...state, data: { ...state.data } };
               return state;
@@ -118,35 +136,31 @@ export const CallSessionStoreProvider = ({
               state = { ...state, data: { ...state.data, activeCallState } };
               return state;
             }),
-          initCall: () =>
+          onPeerSignal: (data) =>
             set((state) => {
-              const activeCallState = state.data.activeCallState;
-              try {
-                navigator.mediaDevices
-                  .getUserMedia(constraints)
-                  .then((stream) => {
-                    // Handle the media stream as needed.
-                    activeCallState.stream = stream;
-                    let peer = new Peer({ stream });
-                    activeCallState.peer2 = peer;
-                    peer.on("signal", (data) => {
-                      state.data.callSessionChannel.sendClientConnectionData({
-                        company_id: activeCallState.companyId,
-                        employee_id: activeCallState.employeeId,
-                        connection_data: data,
-                      });
-                    });
-                  })
-                  .catch((error) => {
-                    console.error("Error accessing media devices.", error);
-                    // Handle the error if constraints cannot be satisfied.
-                  });
-              } catch (err) {
-                console.log(err);
-              }
-              state = { ...state, data: { ...state.data, activeCallState } };
+              state.data.callSessionChannel.sendClientConnectionData({
+                connection_data: data,
+              });
               return state;
             }),
+          initCall: async () => {
+            try {
+              const stream = await navigator.mediaDevices.getUserMedia(
+                constraints
+              );
+              const peer = new Peer({ stream });
+              set((state) => {
+                const activeCallState = state.data.activeCallState;
+                peer.on("signal", state.actions.onPeerSignal);
+                activeCallState.peer2 = peer;
+                activeCallState.stream = stream;
+                state = { ...state, data: { ...state.data, activeCallState } };
+                return state;
+              });
+            } catch (error) {
+              console.log(error);
+            }
+          },
           dismissAll: () =>
             set((state) => {
               const activeCallState = state.data.activeCallState;

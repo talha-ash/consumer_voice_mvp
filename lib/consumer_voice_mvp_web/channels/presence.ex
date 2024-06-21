@@ -11,12 +11,12 @@ defmodule ConsumerVoiceMvpWeb.Presence do
     otp_app: :consumer_voice_mvp,
     pubsub_server: ConsumerVoiceMvp.PubSub
 
-  @employee_company_topic Const.encode(:employee_company_topic)
+  # @employee_company_topic Const.encode(:employee_company_topic)
 
-  def subscribe_employee_presence(company_id) do
-    Phoenix.PubSub.subscribe(
-      ConsumerVoiceMvp.PubSub,
-      "#{@employee_company_topic}#{company_id}"
-    )
-  end
+  # def subscribe_employee_presence(company_id) do
+  #   Phoenix.PubSub.subscribe(
+  #     ConsumerVoiceMvp.PubSub,
+  #     "#{@employee_company_topic}#{company_id}"
+  #   )
+  # end
 end

@@ -37,6 +37,7 @@ export interface ICallSessionStore {
     onClientConnectionData: (connectionData: Peer.SignalData) => void;
     createCallSessionChannel: (sessionId: string) => void;
     onPeerSignal: (data: Peer.SignalData) => void;
+    onClientCallDrop: () => void;
   };
 }
 
@@ -46,7 +47,7 @@ export const CallSessionStoreProvider = ({
 }: {
   children: React.ReactNode;
   sessionId: string;
-}) => {
+}) => {  
   const [store] = useState(() =>
     createStore<ICallSessionStore>((set) => {
       const initializingCallState =
@@ -75,8 +76,9 @@ export const CallSessionStoreProvider = ({
               );
               return state;
             }),
-          sendDropCall: async () =>
+          onClientCallDrop: () =>
             set((state) => {
+              state.actions.dismissAll();
               state.data.activeCallState = {
                 callActive: false,
                 callClient: null,
@@ -87,7 +89,24 @@ export const CallSessionStoreProvider = ({
                 peer1: null,
                 audioEle: null,
               };
-              state.data.callSessionChannel.dropCall();
+              state = { ...state, data: { ...state.data } };
+              return state;
+            }),
+          sendDropCall: async () =>
+            set((state) => {
+              state.actions.dismissAll();
+              state.data.activeCallState = {
+                callActive: false,
+                callClient: null,
+                clientConnectionData: null,
+                employeeConnectionData: null,
+                sessionId: null,
+                stream: null,
+                peer1: null,
+                audioEle: null,
+              };
+              state.data.callSessionChannel.sendDropCall();
+              state = { ...state, data: { ...state.data } };
               return state;
             }),
 

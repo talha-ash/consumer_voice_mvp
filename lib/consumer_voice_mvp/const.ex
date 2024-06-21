@@ -27,6 +27,8 @@ defmodule ConsumerVoiceMvp.Const do
     br_client_connection_data: "br_client_connection_data",
     br_en_employee_connection_data: "br_en_employee_connection_data",
     br_en_client_connection_data: "br_en_client_connection_data",
+    br_en_client_call_drop: "br_en_client_call_drop",
+    br_en_employee_call_drop: "br_en_employee_call_drop",
 
     # Client Hanle In events name
     client_call_initiate: "client_call_initiate",

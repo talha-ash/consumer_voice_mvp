@@ -34,6 +34,9 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
       {:error, message} ->
         {:error, message}
 
+      {:not_found, message} ->
+        {:ok, message}
+
       _ ->
         {:error, "Unable todo actions on employee offline"}
     end
