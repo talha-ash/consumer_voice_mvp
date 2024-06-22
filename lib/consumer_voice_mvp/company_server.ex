@@ -19,10 +19,10 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   @employee_topic Const.encode(:employee_topic)
   @employee_accept_call_decoded Const.decode("employee_accept_call")
 
-  @employee_drop_call_decoded Const.decode("employee_drop_call")
-  @client_drop_call_decoded Const.decode("client_drop_call")
+  @employee_terminate_call_decoded Const.decode("employee_terminate_call")
+  @client_terminate_call_decoded Const.decode("client_terminate_call")
 
-  @br_en_call_drop Const.encode(:br_en_call_drop)
+  @br_en_call_terminate Const.encode(:br_en_call_terminate)
   @br_client_connection_data Const.encode(:br_client_connection_data)
 
   def start_link(init_arg) do
@@ -43,7 +43,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
     state = %{
       status: Const.encode(:company_status_offline),
-      company: Helpers.struct_to_map_drop(company, [:__meta__, :users])
+      company: Helpers.struct_to_map_terminate(company, [:__meta__, :users])
     }
 
     {:ok, state}
@@ -62,7 +62,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   def handle_cast({:on_employee_offline, employee_id}, state) do
     case CompanyServerData.on_employee_offline(employee_id, state.company.id) do
       {:ok, _call} ->
-        # broadcast_employee_call_drop(call.client_id)
+        # broadcast_employee_call_terminate(call.client_id)
         # broadcast_state_update(state)
         {:noreply, state}
 
@@ -88,7 +88,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     case CompanyServerData.on_client_offline(client_id, state.company.id) do
       {:ok, _call} ->
         # broadcast_state_update(state)
-        # broadcast_client_call_drop(call.employee_id)
+        # broadcast_client_call_terminate(call.employee_id)
 
         {:noreply, state}
 
@@ -131,12 +131,12 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   end
 
   @impl true
-  def handle_cast({@employee_drop_call_decoded, params}, state) do
+  def handle_cast({@employee_terminate_call_decoded, params}, state) do
     {employee_id} = params
 
-    case CompanyServerData.on_drop_call({:employee, employee_id, state.company.id}) do
+    case CompanyServerData.on_terminate_call({:employee, employee_id, state.company.id}) do
       {:ok, _call} ->
-        # broadcast_employee_call_drop(client_id)
+        # broadcast_employee_call_terminate(client_id)
         {:noreply, state}
 
       {:error, message} ->
@@ -146,17 +146,17 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   end
 
   @impl true
-  def handle_cast({@client_drop_call_decoded, {client_id}}, state) do
-    {:ok, _call} = CompanyServerData.on_drop_call({:client, client_id, state.company.id})
+  def handle_cast({@client_terminate_call_decoded, {client_id}}, state) do
+    {:ok, _call} = CompanyServerData.on_terminate_call({:client, client_id, state.company.id})
 
-    # broadcast_client_call_drop(call.employee_id)
+    # broadcast_client_call_terminate(call.employee_id)
     {:noreply, state}
   end
 
   @impl true
   def handle_cast({@client_connection_data_decoded, params}, state) do
     {connection_data, _client_id, employee_id} = params
-    # {state, employee_id} = CompanyServerData.on_drop_call(state, client_id, nil)
+    # {state, employee_id} = CompanyServerData.on_terminate_call(state, client_id, nil)
 
     broadcast_client_connection_data({connection_data, employee_id})
     {:noreply, state}
@@ -194,18 +194,18 @@ defmodule ConsumerVoiceMvp.CompanyServer do
     )
   end
 
-  # defp broadcast_employee_call_drop(client_id) do
+  # defp broadcast_employee_call_terminate(client_id) do
   #   ConsumerVoiceMvpWeb.Endpoint.broadcast!(
   #     "#{@client_topic}#{client_id}",
-  #     @br_en_call_drop,
+  #     @br_en_call_terminate,
   #     %{}
   #   )
   # end
 
-  # defp broadcast_client_call_drop(employee_id) do
+  # defp broadcast_client_call_terminate(employee_id) do
   #   ConsumerVoiceMvpWeb.Endpoint.broadcast!(
   #     "#{@employee_topic}#{employee_id}",
-  #     @br_en_call_drop,
+  #     @br_en_call_terminate,
   #     %{}
   #   )
   # end

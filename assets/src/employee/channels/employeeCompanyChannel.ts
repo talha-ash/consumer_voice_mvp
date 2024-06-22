@@ -5,7 +5,7 @@ import socket from "../../shared/userSocket";
 import {
   EMPLOYEE_ACCEPT_CALL,
   EMPLOYEE_COMPANY_TOPIC,
-  EMPLOYEE_DROP_CALL,
+  EMPLOYEE_TERMINATE_CALL,
   EN_COMPANY_STATE_UPDATE,
 } from "../constants";
 import { companyStateType } from "../type";
@@ -51,9 +51,9 @@ export class EmployeeCompanyChannel {
     });
   }
 
-  sendDropCall(clientId: string) {
-    console.log("sendDropCall", clientId);
-    this.channel.push(EMPLOYEE_DROP_CALL, { client_id: clientId });
+  sendTerminateCall(clientId: string) {
+    console.log("sendTerminateCall", clientId);
+    this.channel.push(EMPLOYEE_TERMINATE_CALL, { client_id: clientId });
   }
 
   handleEvents() {

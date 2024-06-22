@@ -15,7 +15,7 @@ type clientCompanyStoreType = {
 interface IClientChannelStore {
   data: clientCompanyStoreType;
   actions: {
-    senDropCall: (companyId: string, employeeId: string) => void;
+    senTerminateCall: (companyId: string, employeeId: string) => void;
     sendClientConnectionData: (payload: {
       connection_data: Peer.SignalData;
       employee_id: string;
@@ -49,9 +49,9 @@ export const ClientChannelStoreProvider = ({
               set((state) => {
                 state.data.clientChannel.removeStoreEvents(eventsToRemove);
               }),
-            senDropCall: (companyId: string, employeeId: string) =>
+            senTerminateCall: (companyId: string, employeeId: string) =>
               set((state) => {
-                state.data.clientChannel.dropCall(companyId, employeeId);
+                state.data.clientChannel.terminateCall(companyId, employeeId);
               }),
             sendClientConnectionData: (payload: {
               connection_data: Peer.SignalData;

@@ -1,13 +1,13 @@
 import { Channel } from "phoenix";
 import Peer from "simple-peer";
 import {
-  BR_EN_CLIENT_CALL_DROP,
+  BR_EN_CLIENT_CALL_TERMINATE,
   BR_EN_CLIENT_CONNECTION_DATA,
   BR_EN_ON_CALL_ACTIVE,
   EMPLOYEE_CONNECTION_DATA,
 } from "../../shared/constants";
 import socket from "../../shared/userSocket";
-import { EMPLOYEE_DROP_CALL } from "../constants";
+import { EMPLOYEE_TERMINATE_CALL } from "../constants";
 import { ICallSessionStore } from "../stores/callSessionStore";
 export class CallSessionChannel {
   channel: Channel;
@@ -26,8 +26,8 @@ export class CallSessionChannel {
       });
   }
 
-  sendDropCall() {
-    this.channel.push(EMPLOYEE_DROP_CALL, {});
+  sendTerminateCall() {
+    this.channel.push(EMPLOYEE_TERMINATE_CALL, {});
   }
   sendEmployeeConnectionData(connectionData: Peer.SignalData) {
     this.channel.push(EMPLOYEE_CONNECTION_DATA, {
@@ -39,8 +39,8 @@ export class CallSessionChannel {
     this.channel.on(BR_EN_ON_CALL_ACTIVE, (message) => {
       //   this.emitter.emit(BR_EN_ON_CALL_ACTIVE, message);
     });
-    this.channel.on(BR_EN_CLIENT_CALL_DROP, () => {
-      //   this.emitter.emit(BR_EN_CALL_DROP);
+    this.channel.on(BR_EN_CLIENT_CALL_TERMINATE, () => {
+      //   this.emitter.emit(BR_EN_CALL_TERMINATE);
       this.storeActions.onClientCallDrop();
     });
     this.channel.on(BR_EN_CLIENT_CONNECTION_DATA, (message) => {

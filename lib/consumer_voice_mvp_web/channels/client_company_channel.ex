@@ -22,7 +22,7 @@ defmodule ConsumerVoiceMvpWeb.ClientCompanyChannel do
 
     GenServer.cast(server_pid, {:on_client_online, client})
 
-    # ConsumerVoiceMvpWeb.Presence.subscribe_employee_presence(company_id)
+    ConsumerVoiceMvpWeb.Presence.subscribe_company_employee_presence(company_id)
 
     socket =
       socket
@@ -44,12 +44,20 @@ defmodule ConsumerVoiceMvpWeb.ClientCompanyChannel do
   end
 
   @impl true
-  def handle_info({:employee_precense_update, payload}, socket) do
+  def handle_info(%{event: "presence_diff", payload: payload}, socket) do
     %{joins: joins} = payload
-    IO.inspect(joins, label: "Presence Diff")
+    IO.inspect(joins, label: "Presence Diff Event")
     broadcast_presence_changes(socket, joins)
     {:noreply, socket}
   end
+
+  # @impl true
+  # def handle_info({:employee_precense_update, payload}, socket) do
+  #   %{joins: joins} = payload
+  #   IO.inspect(joins, label: "Presence Diff")
+  #   broadcast_presence_changes(socket, joins)
+  #   {:noreply, socket}
+  # end
 
   @impl true
   def terminate(reason, _socket) do

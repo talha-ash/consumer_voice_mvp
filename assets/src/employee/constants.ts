@@ -4,4 +4,4 @@ export const EMPLOYEE_STATUS_BUSY = "busy";
 export const EMPLOYEE_STATUS_IDLE = "idle";
 export const EMPLOYEE_STATUS_OFFLINE = "offline";
 export const EMPLOYEE_ACCEPT_CALL = "employee_accept_call";
-export const EMPLOYEE_DROP_CALL = "employee_drop_call";
+export const EMPLOYEE_TERMINATE_CALL = "employee_terminate_call";

@@ -10,9 +10,9 @@ export const useActiveCall = () => {
   );
   const onAcceptCall = useEmployeeStore((state) => state.actions.onAcceptCall);
 
-  const dropCall = useEmployeeStore((state) => state.actions.dropCall);
-  const sendDropCall = useEmployeeCompanyChannelStore(
-    (state) => state.actions.sendDropCall
+  const terminateCall = useEmployeeStore((state) => state.actions.terminateCall);
+  const sendTerminateCall = useEmployeeCompanyChannelStore(
+    (state) => state.actions.sendTerminateCall
   );
   const peer1 = useRef<Peer.Instance | null>(null);
   const audioEle = useRef<HTMLAudioElement | null>(null);
@@ -91,11 +91,11 @@ export const useActiveCall = () => {
     }
   };
 
-  const handleDropCall = () => {
+  const handleTerminateCall = () => {
     dismissAll();
-    dropCall();
-    sendDropCall(activeCallState.callClient?.id!);
+    terminateCall();
+    sendTerminateCall(activeCallState.callClient?.id!);
   };
 
-  return { dismissAll, initCall, handleAcceptCall, handleDropCall };
+  return { dismissAll, initCall, handleAcceptCall, handleTerminateCall };
 };

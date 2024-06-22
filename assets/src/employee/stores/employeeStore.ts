@@ -15,8 +15,8 @@ interface IEmployeeStore {
     toggleCallModal: (loading?: boolean) => void;
     onAcceptCall: (employeeConnectionData: Peer.SignalData) => void;
     onCallActive: (message: { sessionId: string; clientId: string }) => void;
-    dropCall: () => void;
-    onEmployeeDropCall: () => void;
+    terminateCall: () => void;
+    onEmployeeTerminateCall: () => void;
     onClientConnectionData: (clientConnectionData: Peer.SignalData) => void;
     employeeStoreObserver: (emitter: EmployeeChannelEmitter) => void;
     clearInitializingCallState: () => void;
@@ -85,14 +85,14 @@ export const useEmployeeStore = create(
           state.data.initializingCallState.callClient!.id = message.clientId;
           console.log(current(state.data));
         }),
-      dropCall: () =>
+      terminateCall: () =>
         set((state) => {
           state.data.initializingCallState.callActive = false;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.callClient = null;
           state.data.initializingCallState.callModal = false;
         }),
-      onEmployeeDropCall: () =>
+      onEmployeeTerminateCall: () =>
         set((state) => {
           state.data.initializingCallState.callActive = false;
           state.data.initializingCallState.callInitiateLoading = false;
@@ -119,9 +119,9 @@ export const useEmployeeStore = create(
         }),
       employeeStoreObserver: (emitter: EmployeeChannelEmitter) =>
         set((state) => {
-          const onEmployeeDropCall = state.actions.onEmployeeDropCall;
-          emitter.on("br_en_call_drop", () => {
-            onEmployeeDropCall();
+          const onEmployeeTerminateCall = state.actions.onEmployeeTerminateCall;
+          emitter.on("br_en_call_terminate", () => {
+            onEmployeeTerminateCall();
           });
           const onCallActive = state.actions.onCallActive;
           emitter.on("br_en_on_call_active", (message) => {

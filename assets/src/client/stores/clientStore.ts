@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import {
-  BR_EN_CALL_DROP,
+  BR_EN_CALL_TERMINATE,
   BR_EN_ON_CALL_ACTIVE,
   ROLE_EMPLOYEE,
 } from "../../shared/constants";
@@ -20,8 +20,8 @@ interface IClientStore {
     }) => void;
     toggleCallModal: (loading?: boolean) => void;
     onInitiateCall: (companyId: string) => void;
-    dropCall: () => void;
-    onEmployeeDropCall: () => void;
+    terminateCall: () => void;
+    onEmployeeTerminateCall: () => void;
     clearInitializingCallState: () => void;
     clientStoreObserver: (emitter: ClientChannelEmitter) => void;
   };
@@ -93,14 +93,14 @@ export const useClientStore = create(
           state.data.initializingCallState.callModal =
             loading ?? !state.data.initializingCallState.callModal;
         }),
-      dropCall: () =>
+      terminateCall: () =>
         set((state) => {
           state.data.initializingCallState.callActive = false;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.callModal = false;
           state.data.initializingCallState.companyId = "";
         }),
-      onEmployeeDropCall: () =>
+      onEmployeeTerminateCall: () =>
         set((state) => {
           state.data.initializingCallState.callActive = false;
           state.data.initializingCallState.callInitiateLoading = false;
@@ -110,9 +110,9 @@ export const useClientStore = create(
         }),
       clientStoreObserver: (emitter: ClientChannelEmitter) =>
         set((state) => {
-          const onEmployeeDropCall = state.actions.onEmployeeDropCall;
-          emitter.on(BR_EN_CALL_DROP, () => {
-            onEmployeeDropCall();
+          const onEmployeeTerminateCall = state.actions.onEmployeeTerminateCall;
+          emitter.on(BR_EN_CALL_TERMINATE, () => {
+            onEmployeeTerminateCall();
           });
           const onCallActive = state.actions.onCallActive;
           emitter.on(BR_EN_ON_CALL_ACTIVE, (message) => {

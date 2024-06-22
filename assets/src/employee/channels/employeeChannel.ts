@@ -1,7 +1,7 @@
 import { Channel } from "phoenix";
 import {
   BR_CLIENT_CONNECTION_DATA,
-  BR_EN_CALL_DROP,
+  BR_EN_CALL_TERMINATE,
   BR_EN_ON_CALL_ACTIVE,
   CLIENT_CALL_INITIATE,
 } from "../../shared/constants";
@@ -18,7 +18,7 @@ export class EmployeeChannel {
   eventsKeys = [
     CLIENT_CALL_INITIATE,
     BR_EN_ON_CALL_ACTIVE,
-    BR_EN_CALL_DROP,
+    BR_EN_CALL_TERMINATE,
     BR_CLIENT_CONNECTION_DATA,
   ] as const;
   constructor(employeeId: string) {
@@ -54,8 +54,8 @@ export class EmployeeChannel {
       this.emitter.emit(BR_EN_ON_CALL_ACTIVE, message);
     });
 
-    this.channel.on(BR_EN_CALL_DROP, () => {
-      this.emitter.emit(BR_EN_CALL_DROP);
+    this.channel.on(BR_EN_CALL_TERMINATE, () => {
+      this.emitter.emit(BR_EN_CALL_TERMINATE);
     });
     this.channel.on(BR_CLIENT_CONNECTION_DATA, (message) => {
       this.emitter.emit(BR_CLIENT_CONNECTION_DATA, message);
@@ -68,7 +68,7 @@ export class EmployeeChannel {
 
 type EmployeeChannelEvent = {
   [BR_EN_ON_CALL_ACTIVE]: { session_id: string; client_id: string };
-  [BR_EN_CALL_DROP]: void;
+  [BR_EN_CALL_TERMINATE]: void;
   [BR_CLIENT_CONNECTION_DATA]: { connection_data: Peer.SignalData };
   [CLIENT_CALL_INITIATE]: {
     client: IUser;

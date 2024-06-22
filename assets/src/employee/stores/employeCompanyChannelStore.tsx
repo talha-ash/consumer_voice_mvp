@@ -19,7 +19,7 @@ interface IEmployeeCompanyChannelStore {
   data: clientCompanyStoreType;
   actions: {
     sendAcceptCall: (callState: callStateType) => void;
-    sendDropCall: (employeeId: string) => void;
+    sendTerminateCall: (employeeId: string) => void;
     // sendClientConnectionData: (payload: {
     //   connection_data: Peer.SignalData;
     //   employee_id: string;
@@ -70,9 +70,9 @@ export const EmployeeCompanyChannelStoreProvider = ({
                   eventsToRemove
                 );
               }),
-            sendDropCall: (clientId: string) =>
+            sendTerminateCall: (clientId: string) =>
               set((state) => {
-                state.data.employeeCompanyChannel.sendDropCall(clientId);
+                state.data.employeeCompanyChannel.sendTerminateCall(clientId);
               }),
             sendAcceptCall: (callState: callStateType) =>
               set((state) => {

@@ -16,12 +16,12 @@ export const CallSession = ({ sessionId }: CallSessionProps) => {
     (state) => state.data.activeCallState
   );
 
-  const sendDropCall = useCallSessionStore(
-    (state) => state.actions.sendDropCall
+  const sendTerminateCall = useCallSessionStore(
+    (state) => state.actions.sendTerminateCall
   );
 
-  const handleDropCall = () => {
-    sendDropCall().then(() => {
+  const handleTerminateCall = () => {
+    sendTerminateCall().then(() => {
       navigate("/");
     });
   };
@@ -40,7 +40,7 @@ export const CallSession = ({ sessionId }: CallSessionProps) => {
     <div>
       <h1>Call Session {sessionId}</h1>
       <div>
-        <Button text={"Drop Call"} onClick={handleDropCall} />
+        <Button text={"Drop Call"} onClick={handleTerminateCall} />
       </div>
     </div>
   );

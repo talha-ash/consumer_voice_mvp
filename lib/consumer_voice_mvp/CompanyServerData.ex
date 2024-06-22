@@ -145,13 +145,13 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
 
   ## Example
 
-      iex> MyApp.Calls.on_drop_call({:client, 123, 456})
+      iex> MyApp.Calls.on_terminate_call({:client, 123, 456})
       {:ok, %Call{...}}
 
-      iex> MyApp.Calls.on_drop_call({:client, 999, 456})
+      iex> MyApp.Calls.on_terminate_call({:client, 999, 456})
       {:error, "No non-ended call found for client 999 in company 456"}
   """
-  def on_drop_call({:client, client_id, company_id}) do
+  def on_terminate_call({:client, client_id, company_id}) do
     with {:ok, call} <- Calls.get_non_ended_call({:client, client_id, company_id}),
          {:ok, _} <- Calls.update_call_status(call.id, @call_status_ended),
          {:ok, _} <-
@@ -167,7 +167,7 @@ defmodule ConsumerVoiceMvp.CompanyServerData do
     end
   end
 
-  def on_drop_call({:employee, employee_id, company_id}) do
+  def on_terminate_call({:employee, employee_id, company_id}) do
     with {:ok, call} <- Calls.get_non_ended_call({:employee, employee_id, company_id}),
          {:ok, _} <- Calls.update_call_status(call.id, @call_status_ended),
          {:ok, _} <-

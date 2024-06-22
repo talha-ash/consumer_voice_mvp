@@ -33,7 +33,7 @@ export interface ICallSessionStore {
   actions: {
     initCall: () => void;
     dismissAll: () => void;
-    sendDropCall: () => Promise<void>;
+    sendTerminateCall: () => Promise<void>;
     onClientConnectionData: (connectionData: Peer.SignalData) => void;
     createCallSessionChannel: (sessionId: string) => void;
     onPeerSignal: (data: Peer.SignalData) => void;
@@ -92,7 +92,7 @@ export const CallSessionStoreProvider = ({
               state = { ...state, data: { ...state.data } };
               return state;
             }),
-          sendDropCall: async () =>
+          sendTerminateCall: async () =>
             set((state) => {
               state.actions.dismissAll();
               state.data.activeCallState = {
@@ -105,7 +105,7 @@ export const CallSessionStoreProvider = ({
                 peer1: null,
                 audioEle: null,
               };
-              state.data.callSessionChannel.sendDropCall();
+              state.data.callSessionChannel.sendTerminateCall();
               state = { ...state, data: { ...state.data } };
               return state;
             }),

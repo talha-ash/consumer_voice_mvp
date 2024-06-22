@@ -2,10 +2,10 @@ import mitt, { Emitter } from "mitt";
 import { Channel } from "phoenix";
 import Peer from "simple-peer";
 import {
-  BR_EN_CALL_DROP,
+  BR_EN_CALL_TERMINATE,
   BR_EN_ON_CALL_ACTIVE,
   CLIENT_CONNECTION_DATA,
-  CLIENT_DROP_CALL,
+  CLIENT_TERMINATE_CALL,
 } from "../../shared/constants";
 import socket from "../../shared/userSocket";
 import { useClientStore } from "../stores/clientStore";
@@ -13,7 +13,7 @@ import { useClientStore } from "../stores/clientStore";
 export class ClientChannel {
   channel: Channel;
   emitter: ClientChannelEmitter = mitt();
-  eventsKeys = [BR_EN_ON_CALL_ACTIVE, BR_EN_CALL_DROP] as const;
+  eventsKeys = [BR_EN_ON_CALL_ACTIVE, BR_EN_CALL_TERMINATE] as const;
   constructor(userId: string) {
     this.channel = socket.channel(`client:${userId}`, {});
     this.channel
@@ -38,8 +38,8 @@ export class ClientChannel {
     });
   }
 
-  dropCall(companyId: string, employeeId: string) {
-    this.channel.push(CLIENT_DROP_CALL, {
+  terminateCall(companyId: string, employeeId: string) {
+    this.channel.push(CLIENT_TERMINATE_CALL, {
       employee_id: employeeId || null,
       company_id: companyId,
     });
@@ -56,8 +56,8 @@ export class ClientChannel {
     this.channel.on(BR_EN_ON_CALL_ACTIVE, (message) => {
       this.emitter.emit(BR_EN_ON_CALL_ACTIVE, message);
     });
-    this.channel.on(BR_EN_CALL_DROP, () => {
-      this.emitter.emit(BR_EN_CALL_DROP);
+    this.channel.on(BR_EN_CALL_TERMINATE, () => {
+      this.emitter.emit(BR_EN_CALL_TERMINATE);
     });
   }
   addDefaultObservers() {
@@ -73,7 +73,7 @@ type ClientChannelEvent = {
     employee_connection_data: Peer.SignalData;
     session_id: string;
   };
-  [BR_EN_CALL_DROP]: void;
+  [BR_EN_CALL_TERMINATE]: void;
 };
 
 export type AttachedClientChannelEvent = [

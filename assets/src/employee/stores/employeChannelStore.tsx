@@ -14,7 +14,7 @@ type clientCompanyStoreType = {
 interface IEmployeeChannelStore {
   data: clientCompanyStoreType;
   actions: {
-    // senDropCall: (companyId: string, employeeId: string) => void;
+    // senTerminateCall: (companyId: string, employeeId: string) => void;
     // sendClientConnectionData: (payload: {
     //   connection_data: Peer.SignalData;
     //   employee_id: string;
@@ -58,9 +58,9 @@ export const EmployeeChannelStoreProvider = ({
               set((state) => {
                 state.data.employeeChannel.removeStoreEvents(eventsToRemove);
               }),
-            // senDropCall: (companyId: string, employeeId: string) =>
+            // senTerminateCall: (companyId: string, employeeId: string) =>
             //   set((state) => {
-            //     state.data.employeeChannel.dropCall(companyId, employeeId);
+            //     state.data.employeeChannel.terminateCall(companyId, employeeId);
             //   }),
             // sendClientConnectionData: (payload: {
             //   connection_data: Peer.SignalData;

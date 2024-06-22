@@ -12,7 +12,7 @@ defmodule ConsumerVoiceMvp.Const do
     company_status_available: :available,
     company_status_busy: :busy,
     company_status_offline: :offline,
-    call_drop: "call_drop",
+    call_terminate: "call_terminate",
 
     # call statuses
     call_status_initiated: :initiated,
@@ -23,22 +23,25 @@ defmodule ConsumerVoiceMvp.Const do
     # en event names
     br_ev_company_state_update: "br_ev_company_state_update",
     br_en_on_call_active: "br_en_on_call_active",
-    br_en_call_drop: "br_en_call_drop",
+    br_en_call_terminate: "br_en_call_terminate",
     br_client_connection_data: "br_client_connection_data",
     br_en_employee_connection_data: "br_en_employee_connection_data",
     br_en_client_connection_data: "br_en_client_connection_data",
-    br_en_client_call_drop: "br_en_client_call_drop",
-    br_en_employee_call_drop: "br_en_employee_call_drop",
+    br_en_client_call_terminate: "br_en_client_call_terminate",
+    br_en_employee_call_terminate: "br_en_employee_call_terminate",
 
     # Client Hanle In events name
     client_call_initiate: "client_call_initiate",
-    client_drop_call: "client_drop_call",
+    client_terminate_call: "client_terminate_call",
     client_connection_data: "client_connection_data",
 
     # Employee Hanle In events name
     employee_accept_call: "employee_accept_call",
-    employee_drop_call: "employee_drop_call",
-    employee_connection_data: "employee_connection_data"
+    employee_terminate_call: "employee_terminate_call",
+    employee_connection_data: "employee_connection_data",
+
+    # Presences Topic
+    employee_company_presence_topic: :employee_company_presence_topic
   ]
 
   for {key, value} <- values do
