@@ -1,7 +1,8 @@
 defmodule ConsumerVoiceMvp.CompanyRegistry do
   def add_company_pid(id) do
     name = "#{__MODULE__}#{inspect(id)}"
-    {:via, Registry, {ConsumerVoiceMvp.CompanyRegistry, name}}
+    IO.inspect("add_company_pid: #{name}")
+    {:via, Registry, {__MODULE__, name}}
   end
 
   def company_pid_lookup(id) do

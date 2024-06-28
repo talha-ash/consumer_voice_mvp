@@ -4,7 +4,7 @@ import { useEmployeeStore } from "./stores/employeeStore";
 import { EmployeeChannelStoreProvider } from "./stores/employeChannelStore";
 import { EmployeeCompanyChannelStoreProvider } from "./stores/employeCompanyChannelStore";
 import { Route, Switch } from "wouter";
-import { CallSessionStoreProvider } from "./stores/callSessionStore";
+
 import { CallSession } from "./screens/CallSession";
 
 const EmployeeApp = () => {
@@ -13,6 +13,7 @@ const EmployeeApp = () => {
   if (!employee.id) {
     return null;
   }
+  console.log("EmployeeApp", performance.now());
 
   return (
     <EmployeeChannelStoreProvider employeeId={employee.id}>
@@ -20,19 +21,12 @@ const EmployeeApp = () => {
         employeeId={employee.id}
         companyId={employee.companyId}
       >
-         <Switch>
+        <Switch>
           <Route path="/" component={Home} />
-          <Route path="/call/:sessionId">
-            {(params) => (
-              <CallSessionStoreProvider sessionId={params.sessionId}>
-                <CallSession {...params} />
-              </CallSessionStoreProvider>
-            )}
-          </Route>
+          <Route path="/call/:sessionId" component={CallSession} />
           {/* Default route in a switch */}
           <Route>404: No such page!</Route>
         </Switch>
-        
       </EmployeeCompanyChannelStoreProvider>
     </EmployeeChannelStoreProvider>
   );

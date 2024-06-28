@@ -70,6 +70,7 @@ export const CallSessionStoreProvider = ({
         actions: {
           createCallSessionChannel: (sessionId: string) =>
             set((state) => {
+              console.log("Call Two Times Employee");
               state.data.callSessionChannel = new CallSessionChannel(
                 sessionId,
                 state.actions

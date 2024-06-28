@@ -1,4 +1,4 @@
-import "../shared/setup"
+import "../shared/setup";
 import { createRoot } from "react-dom/client";
 import "../shared/userSocket";
 import ClientApp from "./ClientApp";
@@ -12,10 +12,10 @@ export const queryClient = new QueryClient();
 if (rootElement) {
   const root = createRoot(rootElement);
   root.render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ClientApp />
-      </QueryClientProvider>
-    </StrictMode>
+    // <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ClientApp />
+    </QueryClientProvider>
+    // </StrictMode>
   );
 }

@@ -1,10 +1,13 @@
 import { Button } from "@/shared/components";
-import { useLocation } from "wouter";
-import { useCallSessionStore } from "../stores/callSessionStore";
-import { useEffect } from "react";
+import { useLocation, useParams } from "wouter";
+import {
+  CallSessionStoreProvider,
+  useCallSessionStore,
+} from "../stores/callSessionStore";
+import { memo, useEffect } from "react";
 import { useEmployeeStore } from "../stores/employeeStore";
 
-export const CallSession = ({ sessionId }: { sessionId: string }) => {
+const Component = ({ sessionId }: { sessionId: string }) => {
   const navigate = useLocation()[1];
 
   const clearInitializingCallState = useEmployeeStore(
@@ -43,3 +46,12 @@ export const CallSession = ({ sessionId }: { sessionId: string }) => {
     </div>
   );
 };
+
+export const CallSession = memo(() => {
+  const {sessionId} = useParams();
+  return (
+    <CallSessionStoreProvider sessionId={sessionId!}>
+      <Component sessionId={sessionId!} />
+    </CallSessionStoreProvider>
+  );
+});

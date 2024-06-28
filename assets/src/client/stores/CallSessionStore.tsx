@@ -72,6 +72,7 @@ export const CallSessionStoreProvider = ({
         actions: {
           createCallSessionChannel: (sessionId: string) =>
             set((state) => {
+              console.log("Call Two Times Client");
               state.data.callSessionChannel = new CallSessionChannel(
                 sessionId,
                 state.actions
@@ -80,7 +81,7 @@ export const CallSessionStoreProvider = ({
               return state;
             }),
           onEmployeeCallDrop: () =>
-            set((state) => {             
+            set((state) => {
               state.actions.dismissAll();
               state.data.activeCallState = {
                 callActive: false,

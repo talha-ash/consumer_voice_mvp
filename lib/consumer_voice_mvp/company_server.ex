@@ -43,7 +43,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
 
     state = %{
       status: Const.encode(:company_status_offline),
-      company: Helpers.struct_to_map_terminate(company, [:__meta__, :users])
+      company: Helpers.struct_to_map_drop(company, [:__meta__, :users])
     }
 
     {:ok, state}
@@ -120,6 +120,8 @@ defmodule ConsumerVoiceMvp.CompanyServer do
         client_id: client_id,
         company_id: state.company.id
       )
+
+    ConsumerVoiceMvp.CallSessionServer.start_link(call.session_id)
 
     broadcast_on_call_active(%{
       employee_id: employee_id,
