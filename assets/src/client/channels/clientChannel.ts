@@ -3,7 +3,7 @@ import { Channel } from "phoenix";
 import Peer from "simple-peer";
 import {
   BR_EN_CALL_TERMINATE,
-  BR_EN_ON_CALL_ACTIVE,
+  BR_EN_ON_CALL_SESSION_START,
   CLIENT_CONNECTION_DATA,
   CLIENT_TERMINATE_CALL,
 } from "../../shared/constants";
@@ -13,7 +13,7 @@ import { useClientStore } from "../stores/clientStore";
 export class ClientChannel {
   channel: Channel;
   emitter: ClientChannelEmitter = mitt();
-  eventsKeys = [BR_EN_ON_CALL_ACTIVE, BR_EN_CALL_TERMINATE] as const;
+  eventsKeys = [BR_EN_ON_CALL_SESSION_START, BR_EN_CALL_TERMINATE] as const;
   constructor(userId: string) {
     this.channel = socket.channel(`client:${userId}`, {});
     this.channel
@@ -53,8 +53,8 @@ export class ClientChannel {
     this.channel.push(CLIENT_CONNECTION_DATA, payload);
   }
   handleEvents() {
-    this.channel.on(BR_EN_ON_CALL_ACTIVE, (message) => {
-      this.emitter.emit(BR_EN_ON_CALL_ACTIVE, message);
+    this.channel.on(BR_EN_ON_CALL_SESSION_START, (message) => {
+      this.emitter.emit(BR_EN_ON_CALL_SESSION_START, message);
     });
     this.channel.on(BR_EN_CALL_TERMINATE, () => {
       this.emitter.emit(BR_EN_CALL_TERMINATE);
@@ -68,7 +68,7 @@ export class ClientChannel {
 }
 
 type ClientChannelEvent = {
-  [BR_EN_ON_CALL_ACTIVE]: {
+  [BR_EN_ON_CALL_SESSION_START]: {
     employee_id: string;
     employee_connection_data: Peer.SignalData;
     session_id: string;

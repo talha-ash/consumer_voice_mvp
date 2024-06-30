@@ -22,16 +22,18 @@ defmodule ConsumerVoiceMvp.Const do
 
     # en event names
     br_ev_company_state_update: "br_ev_company_state_update",
-    br_en_on_call_active: "br_en_on_call_active",
+    br_en_on_call_session_start: "br_en_on_call_session_start",
     br_en_call_terminate: "br_en_call_terminate",
     br_client_connection_data: "br_client_connection_data",
     br_en_employee_connection_data: "br_en_employee_connection_data",
     br_en_client_connection_data: "br_en_client_connection_data",
     br_en_client_call_terminate: "br_en_client_call_terminate",
     br_en_employee_call_terminate: "br_en_employee_call_terminate",
-
+    br_en_session_init: "br_en_session_init",
+    br_en_request_employee_connection_data: "br_en_request_employee_connection_data",
     # Client Hanle In events name
     client_call_initiate: "client_call_initiate",
+    client_init_complete: "client_init_complete",
     client_terminate_call: "client_terminate_call",
     client_connection_data: "client_connection_data",
 
@@ -39,6 +41,7 @@ defmodule ConsumerVoiceMvp.Const do
     employee_accept_call: "employee_accept_call",
     employee_terminate_call: "employee_terminate_call",
     employee_connection_data: "employee_connection_data",
+    employee_init_complete: "employee_init_complete",
 
     # Presences Topic
     employee_company_presence_topic: :employee_company_presence_topic

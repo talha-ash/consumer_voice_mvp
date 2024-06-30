@@ -1,9 +1,9 @@
-import { Button } from "@/shared/components";
+import { Button, Spinner } from "@/shared/components";
 import { useClientStore } from "../stores/clientStore";
 import {
   CallSessionStoreProvider,
   useCallSessionStore,
-} from "../stores/CallSessionStore";
+} from "../stores/callSessionStore";
 import { useLocation, useParams } from "wouter";
 import { useEffect, memo } from "react";
 
@@ -16,9 +16,7 @@ const Component = ({ sessionId }: CallSessionProps) => {
   const clearInitializingCallState = useClientStore(
     (state) => state.actions.clearInitializingCallState
   );
-  const activeCallState = useCallSessionStore(
-    (state) => state.data.activeCallState
-  );
+  const sessionState = useCallSessionStore((state) => state.data.sessionState);
 
   const sendTerminateCall = useCallSessionStore(
     (state) => state.actions.sendTerminateCall
@@ -35,17 +33,24 @@ const Component = ({ sessionId }: CallSessionProps) => {
   }, []);
 
   useEffect(() => {
-    if (!activeCallState.callActive) {
+    if (!sessionState.callSessionStart) {
       navigate("/");
     }
-  }, [activeCallState.callActive]);
+  }, [sessionState.callSessionStart]);
 
   return (
     <div>
       <h1>Call Session {sessionId}</h1>
-      <div>
-        <Button text={"Drop Call"} onClick={handleTerminateCall} />
-      </div>
+      {sessionState.loading ? (
+        <div>
+          <Spinner />
+        </div>
+      ) : null}
+      {sessionState.callActive ? (
+        <div>
+          <Button text={"Drop Call"} onClick={handleTerminateCall} />
+        </div>
+      ) : null}
     </div>
   );
 };

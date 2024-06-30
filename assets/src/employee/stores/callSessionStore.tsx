@@ -16,8 +16,8 @@ const CallSessionStoreContext =
 
 type CallSessionStoreType = {
   callSessionChannel: CallSessionChannel;
-  activeCallState: {
-    callActive: boolean;
+  sessionState: {
+    callSessionStart: boolean;
     callClient: IUser | null;
     clientConnectionData: Peer.SignalData | null;
     employeeConnectionData: Peer.SignalData | null;
@@ -25,6 +25,8 @@ type CallSessionStoreType = {
     stream: MediaStream | null;
     peer1: Peer.Instance | null;
     audioEle: any;
+    loading: boolean;
+    callActive: boolean;
   };
 };
 
@@ -38,6 +40,7 @@ export interface ICallSessionStore {
     createCallSessionChannel: (sessionId: string) => void;
     onPeerSignal: (data: Peer.SignalData) => void;
     onClientCallDrop: () => void;
+    requestEmployeeConnectionData: () => void;
   };
 }
 
@@ -47,7 +50,7 @@ export const CallSessionStoreProvider = ({
 }: {
   children: React.ReactNode;
   sessionId: string;
-}) => {  
+}) => {
   const [store] = useState(() =>
     createStore<ICallSessionStore>((set) => {
       const initializingCallState =
@@ -55,8 +58,8 @@ export const CallSessionStoreProvider = ({
       const state: ICallSessionStore = {
         data: {
           callSessionChannel: {} as CallSessionChannel,
-          activeCallState: {
-            callActive: true,
+          sessionState: {
+            callSessionStart: true,
             callClient: initializingCallState.callClient,
             clientConnectionData: initializingCallState.clientConnectionData,
             employeeConnectionData:
@@ -65,6 +68,8 @@ export const CallSessionStoreProvider = ({
             stream: null,
             peer1: null,
             audioEle: null,
+            loading: true,
+            callActive: false,
           },
         },
         actions: {
@@ -80,8 +85,8 @@ export const CallSessionStoreProvider = ({
           onClientCallDrop: () =>
             set((state) => {
               state.actions.dismissAll();
-              state.data.activeCallState = {
-                callActive: false,
+              state.data.sessionState = {
+                callSessionStart: false,
                 callClient: null,
                 clientConnectionData: null,
                 employeeConnectionData: null,
@@ -89,6 +94,8 @@ export const CallSessionStoreProvider = ({
                 stream: null,
                 peer1: null,
                 audioEle: null,
+                loading: true,
+                callActive: false,
               };
               state = { ...state, data: { ...state.data } };
               return state;
@@ -96,8 +103,8 @@ export const CallSessionStoreProvider = ({
           sendTerminateCall: async () =>
             set((state) => {
               state.actions.dismissAll();
-              state.data.activeCallState = {
-                callActive: false,
+              state.data.sessionState = {
+                callSessionStart: false,
                 callClient: null,
                 clientConnectionData: null,
                 employeeConnectionData: null,
@@ -105,6 +112,8 @@ export const CallSessionStoreProvider = ({
                 stream: null,
                 peer1: null,
                 audioEle: null,
+                loading: true,
+                callActive: false,
               };
               state.data.callSessionChannel.sendTerminateCall();
               state = { ...state, data: { ...state.data } };
@@ -113,15 +122,17 @@ export const CallSessionStoreProvider = ({
 
           onClientConnectionData: (connectionData: Peer.SignalData) =>
             set((state) => {
-              const activeCallState = state.data.activeCallState;
-              activeCallState.clientConnectionData = connectionData;
-              activeCallState.peer1?.signal(connectionData);
-              activeCallState.peer1?.on("stream", (stream) => {
+              const sessionState = state.data.sessionState;
+              sessionState.loading = false;
+              sessionState.callActive = true;
+              sessionState.clientConnectionData = connectionData;
+              sessionState.peer1?.signal(connectionData);
+              sessionState.peer1?.on("stream", (stream) => {
                 if (document.querySelector("audio")) {
                   document.querySelector("audio")?.remove();
                 }
                 const audio = document.createElement("audio");
-                activeCallState.audioEle = audio;
+                sessionState.audioEle = audio;
                 audio.srcObject = stream;
                 audio.play();
               });
@@ -129,17 +140,13 @@ export const CallSessionStoreProvider = ({
                 ...state,
                 data: {
                   ...state.data,
-                  activeCallState: activeCallState,
+                  sessionState: { ...sessionState },
                 },
               };
               return state;
             }),
-          onPeerSignal: (data) =>
-            set((state) => {
-              state.data.callSessionChannel.sendEmployeeConnectionData(data);
-              return state;
-            }),
-          initCall: async () => {
+
+          requestEmployeeConnectionData: async () => {
             try {
               const stream = await navigator.mediaDevices.getUserMedia(
                 constraints
@@ -147,11 +154,36 @@ export const CallSessionStoreProvider = ({
               const peer = new Peer({ initiator: true, stream });
 
               set((state) => {
-                const activeCallState = state.data.activeCallState;
-                activeCallState.peer1 = peer;
-                activeCallState.stream = stream;
-                peer.on("signal", state.actions.onPeerSignal);
-                state = { ...state, data: { ...state.data, activeCallState } };
+                const sessionState = state.data.sessionState;
+                sessionState.peer1 = peer;
+                sessionState.stream = stream;
+
+                state.data.sessionState.peer1!.on(
+                  "signal",
+                  state.actions.onPeerSignal
+                );
+                state = {
+                  ...state,
+                  data: {
+                    ...state.data,
+                    sessionState: sessionState,
+                  },
+                };
+                return state;
+              });
+            } catch (e) {
+              console.log(e);
+            }
+          },
+          onPeerSignal: (data) =>
+            set((state) => {
+              state.data.callSessionChannel.sendEmployeeConnectionData(data);
+              return state;
+            }),
+          initCall: async () => {
+            try {
+              set((state) => {
+                state.data.callSessionChannel.sendEmployeeInitComplete();
                 return state;
               });
             } catch (error) {
@@ -160,38 +192,38 @@ export const CallSessionStoreProvider = ({
           },
           dismissAll: () =>
             set((state) => {
-              const activeCallState = state.data.activeCallState;
-              if (activeCallState.audioEle) {
-                activeCallState.audioEle.remove();
-                activeCallState.audioEle.pause();
-                activeCallState.audioEle.srcObject = null;
-                activeCallState.audioEle = null;
+              const sessionState = state.data.sessionState;
+              if (sessionState.audioEle) {
+                sessionState.audioEle.remove();
+                sessionState.audioEle.pause();
+                sessionState.audioEle.srcObject = null;
+                sessionState.audioEle = null;
                 console.log("Audio Dismisal");
               }
 
-              if (activeCallState.stream) {
-                if (activeCallState.peer1) {
+              if (sessionState.stream) {
+                if (sessionState.peer1) {
                   // @Todo Need to handle when drop by employee
-                  if (!activeCallState.peer1.destroyed) {
-                    activeCallState.peer1.removeStream(activeCallState.stream);
+                  if (!sessionState.peer1.destroyed) {
+                    sessionState.peer1.removeStream(sessionState.stream);
                   }
-                  activeCallState.peer1.removeAllListeners();
-                  activeCallState.peer1.destroy();
-                  activeCallState.peer1 = null;
+                  sessionState.peer1.removeAllListeners();
+                  sessionState.peer1.destroy();
+                  sessionState.peer1 = null;
                   console.log("Peer1 Dismisal");
                 }
-                activeCallState.stream.getTracks().forEach((track) => {
+                sessionState.stream.getTracks().forEach((track) => {
                   track.stop();
                 });
-                activeCallState.stream = null;
+                sessionState.stream = null;
                 console.log("Stream Dismisal");
               }
               state = {
                 ...state,
                 data: {
                   ...state.data,
-                  activeCallState: {
-                    callActive: false,
+                  sessionState: {
+                    callSessionStart: false,
                     employeeConnectionData: null,
                     sessionId: "",
                     stream: null,
@@ -199,6 +231,8 @@ export const CallSessionStoreProvider = ({
                     audioEle: null,
                     callClient: null,
                     clientConnectionData: null,
+                    loading: true,
+                    callActive: false,
                   },
                 },
               };
@@ -211,7 +245,7 @@ export const CallSessionStoreProvider = ({
   );
 
   store.getState().actions.createCallSessionChannel(sessionId);
-  store.getState().actions.initCall();
+  // store.getState().actions.initCall();
   return (
     <CallSessionStoreContext.Provider value={store}>
       {children}

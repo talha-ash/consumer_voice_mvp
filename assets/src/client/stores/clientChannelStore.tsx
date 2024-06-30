@@ -15,14 +15,12 @@ type clientCompanyStoreType = {
 interface IClientChannelStore {
   data: clientCompanyStoreType;
   actions: {
-    senTerminateCall: (companyId: string, employeeId: string) => void;
-    sendClientConnectionData: (payload: {
-      connection_data: Peer.SignalData;
-      employee_id: string;
-      company_id: string;
-    }) => void;
-    attachedStoreEvents: (eventsToAttached: Array<AttachedClientChannelEvent>) => void;
-    removeStoreEvents: (eventsToRemove: Array<AttachedClientChannelEvent>) => void;
+    attachedStoreEvents: (
+      eventsToAttached: Array<AttachedClientChannelEvent>
+    ) => void;
+    removeStoreEvents: (
+      eventsToRemove: Array<AttachedClientChannelEvent>
+    ) => void;
   };
 }
 
@@ -41,25 +39,17 @@ export const ClientChannelStoreProvider = ({
             clientChannel: new ClientChannel(userId),
           },
           actions: {
-            attachedStoreEvents: (eventsToAttached: Array<AttachedClientChannelEvent>) =>
+            attachedStoreEvents: (
+              eventsToAttached: Array<AttachedClientChannelEvent>
+            ) =>
               set((state) => {
                 state.data.clientChannel.attachedStoreEvents(eventsToAttached);
               }),
-            removeStoreEvents: (eventsToRemove: Array<AttachedClientChannelEvent>) =>
+            removeStoreEvents: (
+              eventsToRemove: Array<AttachedClientChannelEvent>
+            ) =>
               set((state) => {
                 state.data.clientChannel.removeStoreEvents(eventsToRemove);
-              }),
-            senTerminateCall: (companyId: string, employeeId: string) =>
-              set((state) => {
-                state.data.clientChannel.terminateCall(companyId, employeeId);
-              }),
-            sendClientConnectionData: (payload: {
-              connection_data: Peer.SignalData;
-              employee_id: string;
-              company_id: string;
-            }) =>
-              set((state) => {
-                state.data.clientChannel.sendClientConnectionData(payload);
               }),
           },
         };

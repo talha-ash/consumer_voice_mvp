@@ -17,10 +17,10 @@ export const CallModal = () => {
   };
 
   useEffect(() => {
-    if (initializingCallState.callActive) {
+    if (initializingCallState.callSessionStart) {
       navigate(`/call/${initializingCallState.sessionId}`);
     }
-  }, [initializingCallState.callActive]);
+  }, [initializingCallState.callSessionStart]);
 
   return (
     <Modal

@@ -3,19 +3,21 @@ import Peer from "simple-peer";
 import {
   BR_EN_EMPLOYEE_CALL_TERMINATE,
   BR_EN_EMPLOYEE_CONNECTION_DATA,
-  BR_EN_ON_CALL_ACTIVE,
+  BR_EN_ON_CALL_SESSION_START,
+  BR_EN_SESSION_INIT,
   CLIENT_CONNECTION_DATA,
+  CLIENT_INIT_COMPLETE,
   CLIENT_TERMINATE_CALL,
 } from "../../shared/constants";
 import socket from "../../shared/userSocket";
-import type { ICallSessionStore } from "../stores/CallSessionStore";
+import type { ICallSessionStore } from "../stores/callSessionStore";
 
 export class CallSessionChannel {
   channel: Channel;
   storeActions: ICallSessionStore["actions"];
   constructor(sessionId: string, storeActions: ICallSessionStore["actions"]) {
     this.storeActions = storeActions;
-    this.channel = socket.channel(`call:${sessionId}`, {});
+    this.channel = socket.channel(`call:${sessionId}`, { join_by: "client" });
     this.channel
       .join()
       .receive("ok", (resp) => {
@@ -31,16 +33,22 @@ export class CallSessionChannel {
     this.channel.push(CLIENT_TERMINATE_CALL, {});
   }
 
-  sendClientConnectionData(payload: { connection_data: Peer.SignalData }) {
+  sendClientConnectionData(payload: { connection_data: Peer.SignalData }) {    
     this.channel.push(CLIENT_CONNECTION_DATA, payload);
   }
+  sendClientInitComplete() {
+    this.channel.push(CLIENT_INIT_COMPLETE, {});
+  }
   handleEvents() {
-    this.channel.on(BR_EN_ON_CALL_ACTIVE, (message) => {});
+    this.channel.on(BR_EN_ON_CALL_SESSION_START, () => {});
     this.channel.on(BR_EN_EMPLOYEE_CALL_TERMINATE, () => {
       this.storeActions.onEmployeeCallDrop();
     });
     this.channel.on(BR_EN_EMPLOYEE_CONNECTION_DATA, (message) => {
       this.storeActions.onEmployeeConnectionData(message.connection_data);
+    });
+    this.channel.on(BR_EN_SESSION_INIT, () => {
+      this.storeActions.initCall();
     });
   }
 }

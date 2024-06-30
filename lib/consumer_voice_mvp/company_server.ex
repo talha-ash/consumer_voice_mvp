@@ -9,7 +9,7 @@ defmodule ConsumerVoiceMvp.CompanyServer do
   # @client_company_topic Const.encode(:client_company_topic)
 
   # @br_ev_company_state_update Const.encode(:br_ev_company_state_update)
-  @br_en_on_call_active Const.encode(:br_en_on_call_active)
+  @br_en_on_call_session_start Const.encode(:br_en_on_call_session_start)
 
   @client_call_initiate_decoded Const.decode("client_call_initiate")
   @client_call_initiate Const.encode(:client_call_initiate)
@@ -121,13 +121,13 @@ defmodule ConsumerVoiceMvp.CompanyServer do
         company_id: state.company.id
       )
 
-    ConsumerVoiceMvp.CallSessionServer.start_link(call.session_id)
-
-    broadcast_on_call_active(%{
-      employee_id: employee_id,
+    ConsumerVoiceMvp.CallSessionServer.start_link(%{
+      session_id: call.session_id,
+      company_id: state.company.id,
       client_id: client_id,
-      session_id: call.session_id
+      employee_id: employee_id
     })
+
 
     {:noreply, state}
   end
@@ -217,29 +217,6 @@ defmodule ConsumerVoiceMvp.CompanyServer do
       "#{@employee_topic}#{employee_id}",
       @br_client_connection_data,
       %{connection_data: connection_data}
-    )
-  end
-
-  defp broadcast_on_call_active(params) do
-    %{
-      employee_id: employee_id,
-      client_id: client_id,
-      session_id: session_id
-    } = params
-
-    ConsumerVoiceMvpWeb.Endpoint.broadcast!(
-      "#{@employee_topic}#{employee_id}",
-      @br_en_on_call_active,
-      %{client_id: client_id, session_id: session_id}
-    )
-
-    ConsumerVoiceMvpWeb.Endpoint.broadcast!(
-      "#{@client_topic}#{client_id}",
-      @br_en_on_call_active,
-      %{
-        employee_id: employee_id,
-        session_id: session_id
-      }
     )
   end
 end

@@ -25,7 +25,7 @@ export type companyStateType = {
 
 export type callStateType = {
   callInitiateLoading: boolean;
-  callActive: boolean;
+  callSessionStart: boolean;
   callClient: IUser | null;
   callModal: boolean;
   clientConnectionData: Peer.SignalData | null;

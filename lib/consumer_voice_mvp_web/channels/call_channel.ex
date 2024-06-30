@@ -7,24 +7,28 @@ defmodule ConsumerVoiceMvpWeb.CallChannel do
 
   @client_terminate_call Const.encode(:client_terminate_call)
   @client_terminate_call_decoded Const.decode("client_terminate_call")
+  @client_connection_data Const.encode(:client_connection_data)
+  @client_init_complete Const.encode(:client_init_complete)
+
   @employee_terminate_call Const.encode(:employee_terminate_call)
   @employee_terminate_call_decoded Const.decode("employee_terminate_call")
-  @client_connection_data Const.encode(:client_connection_data)
+  @employee_company_topic Const.encode(:employee_company_topic)
   @employee_connection_data Const.encode(:employee_connection_data)
-  @br_en_client_connection_data Const.encode(:br_en_client_connection_data)
-  @br_en_employee_connection_data Const.encode(:br_en_employee_connection_data)
+  @employee_init_complete Const.encode(:employee_init_complete)
+
   @br_en_client_call_terminate Const.encode(:br_en_client_call_terminate)
   @br_en_employee_call_terminate Const.encode(:br_en_employee_call_terminate)
-  @employee_company_topic Const.encode(:employee_company_topic)
+  @br_en_client_connection_data Const.encode(:br_en_client_connection_data)
+  @br_en_employee_connection_data Const.encode(:br_en_employee_connection_data)
 
   @impl true
-  def join("call:" <> session_id, _params, socket) do
+  def join("call:" <> session_id, %{"join_by" => join_by}, socket) do
     %{employee_id: employee_id, client_id: client_id, company_id: company_id} = Sqids.decode_for_session_id!(session_id)
     {:ok, company_server_pid} = CompanyRegistry.company_pid_lookup(company_id)
 
     {:ok, server_pid} = CallSessionRegistry.call_session_pid_lookup(session_id)
 
-    CallSessionServer.track_channel(server_pid, socket)
+    CallSessionServer.track_channel(server_pid, join_by, socket)
 
     socket =
       assign(socket, :session_id, session_id)
@@ -87,13 +91,27 @@ defmodule ConsumerVoiceMvpWeb.CallChannel do
 
   @impl true
   def handle_in(@client_connection_data, payload, socket) do
+    CallSessionServer.connection_data(socket.assigns.server_pid, {:client, payload["connection_data"]})
     broadcast(socket, @br_en_client_connection_data, payload)
     {:noreply, socket}
   end
 
   @impl true
   def handle_in(@employee_connection_data, payload, socket) do
+    CallSessionServer.connection_data(socket.assigns.server_pid, {:employee, payload["connection_data"]})
     broadcast(socket, @br_en_employee_connection_data, payload)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_in(@client_init_complete, _payload, socket) do
+    CallSessionServer.client_init_complete(socket.assigns.server_pid)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_in(@employee_init_complete, _payload, socket) do
+    CallSessionServer.employee_init_complete(socket.assigns.server_pid)
     {:noreply, socket}
   end
 

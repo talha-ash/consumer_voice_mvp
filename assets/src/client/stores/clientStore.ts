@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import {
   BR_EN_CALL_TERMINATE,
-  BR_EN_ON_CALL_ACTIVE,
+  BR_EN_ON_CALL_SESSION_START,
   ROLE_EMPLOYEE,
 } from "../../shared/constants";
 import { IUser, onlineStatusType } from "../../shared/types";
@@ -14,7 +14,7 @@ import { ClientChannelEmitter } from "../channels/clientChannel";
 interface IClientStore {
   actions: {
     setStatus: (status: onlineStatusType) => void;
-    onCallActive: (message: {
+    onCallSessionStart: (message: {
       employee_id: string;      
       session_id: string;
     }) => void;
@@ -31,7 +31,7 @@ interface IClientStore {
     initializingCallState: {
       callModal: boolean;
       callInitiateLoading: boolean;
-      callActive: boolean;
+      callSessionStart: boolean;
       employeeId: string;
       companyId: string;
       employeeConnectionData: Peer.SignalData | null;
@@ -51,7 +51,7 @@ export const useClientStore = create(
       initializingCallState: {
         callModal: false,
         callInitiateLoading: false,
-        callActive: false,
+        callSessionStart: false,
         employeeId: "",
         companyId: "",
         employeeConnectionData: null,
@@ -64,7 +64,7 @@ export const useClientStore = create(
           state.data.initializingCallState = {
             callModal: false,
             callInitiateLoading: false,
-            callActive: false,
+            callSessionStart: false,
             employeeId: "",
             companyId: "",
             employeeConnectionData: null,
@@ -75,9 +75,9 @@ export const useClientStore = create(
         set((state) => {
           state.data.client.status = status;
         }),
-      onCallActive: (message) =>
+      onCallSessionStart: (message) =>
         set((state) => {
-          state.data.initializingCallState.callActive = true;
+          state.data.initializingCallState.callSessionStart = true;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.employeeId = message.employee_id;          
           state.data.initializingCallState.sessionId = message.session_id;
@@ -95,14 +95,14 @@ export const useClientStore = create(
         }),
       terminateCall: () =>
         set((state) => {
-          state.data.initializingCallState.callActive = false;
+          state.data.initializingCallState.callSessionStart = false;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.callModal = false;
           state.data.initializingCallState.companyId = "";
         }),
       onEmployeeTerminateCall: () =>
         set((state) => {
-          state.data.initializingCallState.callActive = false;
+          state.data.initializingCallState.callSessionStart = false;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.callModal = false;
           state.data.initializingCallState.employeeId = "";
@@ -114,9 +114,9 @@ export const useClientStore = create(
           emitter.on(BR_EN_CALL_TERMINATE, () => {
             onEmployeeTerminateCall();
           });
-          const onCallActive = state.actions.onCallActive;
-          emitter.on(BR_EN_ON_CALL_ACTIVE, (message) => {
-            onCallActive(message);
+          const onCallSessionStart = state.actions.onCallSessionStart;
+          emitter.on(BR_EN_ON_CALL_SESSION_START, (message) => {
+            onCallSessionStart(message);
           });
         }),
     },

@@ -5,8 +5,8 @@ import { useEmployeeCompanyChannelStore } from "../stores/employeCompanyChannelS
 import { useCallSessionStore } from "../stores/callSessionStore";
 
 export const useActiveCall = () => {
-  const activeCallState = useCallSessionStore(
-    (state) => state.data.activeCallState
+  const sessionState = useCallSessionStore(
+    (state) => state.data.sessionState
   );
   const onAcceptCall = useEmployeeStore((state) => state.actions.onAcceptCall);
 
@@ -94,7 +94,7 @@ export const useActiveCall = () => {
   const handleTerminateCall = () => {
     dismissAll();
     terminateCall();
-    sendTerminateCall(activeCallState.callClient?.id!);
+    sendTerminateCall(sessionState.callClient?.id!);
   };
 
   return { dismissAll, initCall, handleAcceptCall, handleTerminateCall };

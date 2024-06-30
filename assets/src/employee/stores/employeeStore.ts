@@ -14,7 +14,7 @@ interface IEmployeeStore {
     onClientCall: (client: IUser) => void;
     toggleCallModal: (loading?: boolean) => void;
     onAcceptCall: (employeeConnectionData: Peer.SignalData) => void;
-    onCallActive: (message: { sessionId: string; clientId: string }) => void;
+    onCallSessionStart: (message: { sessionId: string; clientId: string }) => void;
     terminateCall: () => void;
     onEmployeeTerminateCall: () => void;
     onClientConnectionData: (clientConnectionData: Peer.SignalData) => void;
@@ -25,7 +25,7 @@ interface IEmployeeStore {
     employee: IEmployee;
     initializingCallState: {
       callInitiateLoading: boolean;
-      callActive: boolean;
+      callSessionStart: boolean;
       callClient: IUser | null;
       callModal: boolean;
       clientConnectionData: Peer.SignalData | null;
@@ -46,7 +46,7 @@ export const useEmployeeStore = create(
       initializingCallState: {
         callModal: false,
         callInitiateLoading: false,
-        callActive: false,
+        callSessionStart: false,
         callClient: null,
         clientConnectionData: null,
         employeeConnectionData: null,
@@ -76,10 +76,10 @@ export const useEmployeeStore = create(
               employeeConnectionData;
           }
         }),
-      onCallActive: (message) =>
+      onCallSessionStart: (message) =>
         set((state) => {
           console.log("message", message);
-          state.data.initializingCallState.callActive = true;
+          state.data.initializingCallState.callSessionStart = true;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.sessionId = message.sessionId;
           state.data.initializingCallState.callClient!.id = message.clientId;
@@ -87,14 +87,14 @@ export const useEmployeeStore = create(
         }),
       terminateCall: () =>
         set((state) => {
-          state.data.initializingCallState.callActive = false;
+          state.data.initializingCallState.callSessionStart = false;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.callClient = null;
           state.data.initializingCallState.callModal = false;
         }),
       onEmployeeTerminateCall: () =>
         set((state) => {
-          state.data.initializingCallState.callActive = false;
+          state.data.initializingCallState.callSessionStart = false;
           state.data.initializingCallState.callInitiateLoading = false;
           state.data.initializingCallState.callClient = null;
           state.data.initializingCallState.callModal = false;
@@ -110,7 +110,7 @@ export const useEmployeeStore = create(
           state.data.initializingCallState = {
             callModal: false,
             callInitiateLoading: false,
-            callActive: false,
+            callSessionStart: false,
             callClient: null,
             clientConnectionData: null,
             employeeConnectionData: null,
@@ -123,9 +123,9 @@ export const useEmployeeStore = create(
           emitter.on("br_en_call_terminate", () => {
             onEmployeeTerminateCall();
           });
-          const onCallActive = state.actions.onCallActive;
-          emitter.on("br_en_on_call_active", (message) => {
-            onCallActive({
+          const onCallSessionStart = state.actions.onCallSessionStart;
+          emitter.on("br_en_on_call_session_start", (message) => {
+            onCallSessionStart({
               sessionId: message.session_id,
               clientId: message.client_id,
             });

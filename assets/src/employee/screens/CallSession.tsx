@@ -1,4 +1,4 @@
-import { Button } from "@/shared/components";
+import { Button, Spinner } from "@/shared/components";
 import { useLocation, useParams } from "wouter";
 import {
   CallSessionStoreProvider,
@@ -13,9 +13,7 @@ const Component = ({ sessionId }: { sessionId: string }) => {
   const clearInitializingCallState = useEmployeeStore(
     (state) => state.actions.clearInitializingCallState
   );
-  const activeCallState = useCallSessionStore(
-    (state) => state.data.activeCallState
-  );
+  const sessionState = useCallSessionStore((state) => state.data.sessionState);
 
   const sendTerminateCall = useCallSessionStore(
     (state) => state.actions.sendTerminateCall
@@ -32,15 +30,20 @@ const Component = ({ sessionId }: { sessionId: string }) => {
   }, []);
 
   useEffect(() => {
-    if (!activeCallState.callActive) {
+    if (!sessionState.callSessionStart) {
       navigate("/");
     }
-  }, [activeCallState.callActive]);
+  }, [sessionState.callSessionStart]);
 
   return (
     <div>
       Call Session {sessionId}
-      {activeCallState.callActive ? (
+      {sessionState.loading ? (
+        <div>
+          <Spinner />
+        </div>
+      ) : null}
+      {sessionState.callActive ? (
         <Button text={"Drop Call"} onClick={handleTerminateCall} />
       ) : null}
     </div>
@@ -48,7 +51,7 @@ const Component = ({ sessionId }: { sessionId: string }) => {
 };
 
 export const CallSession = memo(() => {
-  const {sessionId} = useParams();
+  const { sessionId } = useParams();
   return (
     <CallSessionStoreProvider sessionId={sessionId!}>
       <Component sessionId={sessionId!} />
