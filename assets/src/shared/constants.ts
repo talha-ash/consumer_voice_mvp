@@ -1,0 +1,34 @@
+export const ROLE_CLIENT = "client";
+export const ROLE_ADMIN = "admin";
+export const ROLE_EMPLOYEE = "employee";
+export const ONLINE_STATUS_ON = "on";
+export const ONLINE_STATUS_OFF = "offline";
+export const ONLINE_STATUS_BUSY = "busy";
+export const COMPANY_STATUS_AVAILABLE = "available";
+export const COMPANY_STATUS_OFFLINE = "offline";
+export const COMPANY_STATUS_BUSY = "busy";
+export const ONLINE_STATUS_IDLE = "idle";
+export const CLIENT_CALL_INITIATE = "client_call_initiate";
+export const CLIENT_REJECT_CALL_REQUEST = "client_reject_call_request";
+export const CLIENT_TERMINATE_CALL = "client_terminate_call";
+export const BR_EN_ON_CALL_SESSION_START = "br_en_on_call_session_start";
+export const BR_EN_CLIENT_CALL_CANCEL = "br_en_client_call_cancel";
+export const BR_EN_CALL_TERMINATE = "br_en_call_terminate";
+export const BR_CLIENT_CONNECTION_DATA = "br_client_connection_data";
+export const CLIENT_CONNECTION_DATA = "client_connection_data";
+export const CLIENT_INIT_COMPLETE = "client_init_complete";
+export const EMPLOYEE_INIT_COMPLETE = "employee_init_complete";
+export const EMPLOYEE_CONNECTION_DATA = "employee_connection_data";
+export const BR_EN_EMPLOYEE_CONNECTION_DATA = "br_en_employee_connection_data";
+export const BR_EN_CLIENT_CONNECTION_DATA = "br_en_client_connection_data";
+export const BR_EN_CLIENT_CALL_TERMINATE = "br_en_client_call_terminate";
+export const BR_EN_EMPLOYEE_CALL_TERMINATE = "br_en_employee_call_terminate";
+export const BR_EN_SESSION_INIT = "br_en_session_init";
+export const BR_EN_REQUEST_EMPLOYEE_CONNECTION_DATA =
+  "br_en_request_employee_connection_data";
+export const BR_EN_ENTITY_DOWN = "br_en_entity_down";
+export const BR_EN_DOWN_COUNT = "br_en_down_count";
+export const BR_EN_DOWN_COUNT_TIMEOUT = "br_en_down_count_timeout";
+export const BR_EN_ENTITY_HAS_CALL = "br_en_entity_has_call";
+export const BR_EN_CLIENT_CALL_REQUEST_TIMEOUT =
+  "br_en_client_call_request_timeout";

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title suffix=" · Phoenix Framework">
+      <%= assigns[:page_title] || "ConsumerVoiceMvp" %>
+    </.live_title>
+    <%= if @current_user.role == "employee" do %>
+      <link phx-track-static rel="stylesheet" href={~p"/assets/src/employee/main.css"} />
+    <% else %>
+      <link phx-track-static rel="stylesheet" href={~p"/assets/src/client/main.css"} />
+    <% end %>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/src/shared/app.css"} />
+    <script>
+      window.userToken = "<%= assigns[:user_token] %>";
+    </script>
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/src/app.js"}>
+    </script>
+  </head>
+  <body class="bg-white antialiased">
+    <%= if @current_user do %>
+      <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+        <li class="text-[0.8125rem] leading-6 text-zinc-900">
+          <%= @current_user.email %>
+        </li>
+        <li>
+          <.link
+            href={~p"/users/settings"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Settings
+          </.link>
+        </li>
+        <li>
+          <.link
+            href={~p"/users/log_out"}
+            method="delete"
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Log out
+          </.link>
+        </li>
+      </ul>
+      <div id="root"></div>
+      <%= @inner_content %>
+      <%= if @current_user.role == :employee do %>
+        <script phx-track-static type="text/javascript" src={~p"/assets/src/employee/main.js"}>
+        </script>
+      <% else %>
+        <script phx-track-static type="text/javascript" src={~p"/assets/src/client/main.js"}>
+        </script>
+      <% end %>
+    <% end %>
+  </body>
+</html>
