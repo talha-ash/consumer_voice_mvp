@@ -6,7 +6,7 @@ defmodule Mix.Tasks.AssetsBuild do
 
   @impl Mix.Task
   def run(_args) do
-    Mix.shell().cmd("cd assets && node build.js --deploy && cd ../")
+    Mix.shell().cmd("cd assets && npm install && node build.js --deploy && cd ../")
     Mix.shell().cmd("mix phx.digest")
   end
 end
