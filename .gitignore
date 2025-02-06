@@ -35,3 +35,4 @@ consumer_voice_mvp-*.tar
 npm-debug.log
 /assets/node_modules/
 
+*.db*

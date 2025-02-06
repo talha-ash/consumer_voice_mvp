@@ -17,9 +17,9 @@ defmodule ConsumerVoiceMvp.CompanyServersSupervisor do
   end
 
   def start_companies_server do
-    if Mix.env() == :prod do
-      temp_seed()
-    end
+    # if Mix.env() == :prod do
+    temp_seed()
+    # end
 
     companies = Repo.all(Company)
 
