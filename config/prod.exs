@@ -16,18 +16,18 @@ config :swoosh, local: false
 # Do not print debug messages in production
 config :logger, level: :info
 
-# Runtime production configuration, including reading
-# of environment variables, is done on config/runtime.exs.
+# # Runtime production configuration, including reading
+# # of environment variables, is done on config/runtime.exs.
 
-config :consumer_voice_mvp, ConsumerVoiceMvpWeb.Endpoint,
-  # Possibly not needed, but doesn't hurt
-  http: [port: {:system, "PORT"}],
-  url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
-  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
-  server: true
+# config :consumer_voice_mvp, ConsumerVoiceMvpWeb.Endpoint,
+#   # Possibly not needed, but doesn't hurt
+#   http: [port: {:system, "PORT"}],
+#   url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
+#   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+#   server: true
 
-config :consumer_voice_mvp, ConsumerVoiceMvp.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL"),
-  ssl: true,
-  pool_size: 2
+# config :consumer_voice_mvp, ConsumerVoiceMvp.Repo,
+#   adapter: Ecto.Adapters.Postgres,
+#   url: System.get_env("DATABASE_URL"),
+#   ssl: true,
+#   pool_size: 2
