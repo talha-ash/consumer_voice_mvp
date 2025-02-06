@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
     <.live_title suffix=" · Phoenix Framework">
-      <%= assigns[:page_title] || "ConsumerVoiceMvp" %>
+      {assigns[:page_title] || "ConsumerVoiceMvp"}
     </.live_title>
     <%= if @current_user.role == "employee" do %>
       <link phx-track-static rel="stylesheet" href={~p"/assets/src/employee/main.css"} />
@@ -23,16 +23,16 @@
     <%= if @current_user do %>
       <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <li class="text-[0.8125rem] leading-6 text-zinc-900">
-          <%= @current_user.email %>
+          {@current_user.email}
         </li>
-        <li>
+        <%!-- <li>
           <.link
             href={~p"/users/settings"}
             class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
           >
             Settings
           </.link>
-        </li>
+        </li> --%>
         <li>
           <.link
             href={~p"/users/log_out"}
@@ -44,7 +44,7 @@
         </li>
       </ul>
       <div id="root"></div>
-      <%= @inner_content %>
+      {@inner_content}
       <%= if @current_user.role == :employee do %>
         <script phx-track-static type="text/javascript" src={~p"/assets/src/employee/main.js"}>
         </script>
